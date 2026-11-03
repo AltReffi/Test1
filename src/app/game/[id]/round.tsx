@@ -12,6 +12,7 @@ import {
   emptyDraft,
   roundFromDraft,
   gameSystem,
+  nextDealer,
   type RoundDraft,
 } from "@/game/model";
 import { useGames } from "@/game/store";
@@ -93,7 +94,7 @@ export default function RoundScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: editIndex !== null ? `Ret runde ${editIndex + 1}` : `Runde ${game.rounds.length + 1}` }} />
+      <Stack.Screen options={{ title: editIndex !== null ? `Ret runde ${editIndex + 1}` : `Runde ${game.rounds.length + 1} · ${nextDealer(game)} giver` }} />
       <ScrollView ref={scrollRef} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.typeRow}>
           <ChipRow>

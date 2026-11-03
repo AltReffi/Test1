@@ -30,7 +30,26 @@ export interface Game {
   oerePerPoint: number;
   /** Spil om kroner. Mangler i ældre spil — der betyder oerePerPoint > 0 "til". */
   moneyEnabled?: boolean;
+  /**
+   * Plads (0–3) for den, der gav i første runde. Mangler = første spiller.
+   * Giveren går én plads videre efter hver runde, også når alle melder pas.
+   */
+  firstDealer?: number;
   rounds: Round[];
+}
+
+/** Den spiller, der giver i næste runde. Spillerne står i den rækkefølge, de sidder. */
+export function nextDealer(game: Pick<Game, "players" | "rounds" | "firstDealer">): PlayerId {
+  const n = game.players.length;
+  const index = (((game.firstDealer ?? 0) + game.rounds.length) % n + n) % n;
+  return game.players[index]!;
+}
+
+/** Ny værdi for firstDealer, så `player` giver i næste runde. */
+export function firstDealerFor(game: Pick<Game, "players" | "rounds">, player: PlayerId): number {
+  const n = game.players.length;
+  const seat = game.players.indexOf(player);
+  return (((seat - game.rounds.length) % n) + n) % n;
 }
 
 export function systemById(id: string): ScoringSystem {

@@ -1,6 +1,6 @@
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { describeRound, gameSystem, roundsWithRunningTotals } from "@/game/model";
+import { describeRound, firstDealerFor, gameSystem, nextDealer, roundsWithRunningTotals } from "@/game/model";
 import { useGames } from "@/game/store";
 import { Button, Points } from "@/ui/components";
 import { useTheme } from "@/ui/theme";
@@ -8,7 +8,7 @@ import { useTheme } from "@/ui/theme";
 export default function GameScreen() {
   const t = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { getGame } = useGames();
+  const { getGame, updateGame } = useGames();
   const game = getGame(id);
 
   if (!game) {
@@ -22,6 +22,12 @@ export default function GameScreen() {
   const system = gameSystem(game);
   const rows = roundsWithRunningTotals(system, game);
   const current = rows.at(-1)?.running ?? Object.fromEntries(game.players.map((p) => [p, 0]));
+  const dealer = nextDealer(game);
+  // Tryk på "Skift" flytter giveren én plads videre, hvis appen og bordet er uenige.
+  const shiftDealer = () => {
+    const next = game.players[(game.players.indexOf(dealer) + 1) % game.players.length]!;
+    updateGame(game.id, { firstDealer: firstDealerFor(game, next) });
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -47,8 +53,18 @@ export default function GameScreen() {
                 {p}
               </Text>
               <Points value={current[p] ?? 0} size={22} bold />
+              <Text style={[styles.dealerMark, { color: t.accent }]}>{p === dealer ? "giver" : " "}</Text>
             </View>
           ))}
+        </View>
+
+        <View style={styles.dealerRow}>
+          <Text style={[styles.dealerText, { color: t.text }]}>
+            <Text style={{ fontWeight: "700" }}>{dealer}</Text> giver runde {game.rounds.length + 1}
+          </Text>
+          <Pressable accessibilityRole="button" accessibilityLabel="Skift giver" hitSlop={10} onPress={shiftDealer}>
+            <Text style={{ color: t.accent, fontSize: 15, fontWeight: "600" }}>Skift</Text>
+          </Pressable>
         </View>
 
         {rows.length === 0 && (
@@ -101,6 +117,9 @@ const styles = StyleSheet.create({
   totals: { flexDirection: "row", borderWidth: 1, borderRadius: 14, padding: 14, gap: 6 },
   totalCell: { flex: 1, minWidth: 0, alignItems: "center" },
   name: { fontSize: 14, fontWeight: "600", marginBottom: 2 },
+  dealerMark: { fontSize: 12, fontWeight: "700", marginTop: 2, textTransform: "uppercase", letterSpacing: 0.5 },
+  dealerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 4 },
+  dealerText: { fontSize: 15 },
   empty: { textAlign: "center", marginTop: 24, fontSize: 16 },
   row: { borderBottomWidth: StyleSheet.hairlineWidth, paddingVertical: 10, gap: 6 },
   rowTitle: { fontSize: 15 },

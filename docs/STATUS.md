@@ -38,6 +38,8 @@ En dansk **pointtæller til es-makker whist** i App Store (og senere Google Play
    - makkerpar
 7. Prøvespil i browseren (iPhone 13 og iPhone SE, 20 runder): en almindelig melding tager 6 tryk inkl. "Ny runde" og "Gem". Rundeskærmen er gjort kompakt (meldinger, påhæng og stik i faste kolonner), og den ruller selv stikkene frem, når makker er valgt.
 8. Egne regelsæt i appen, som gemmes til nye spil. Reglerne kan også rettes i et igangværende spil, hvorefter alle runder regnes om. Ændringer, der gør tidligere runder ugyldige, afvises.
+9. Giver: stillingstavlen og rundeskærmen viser, hvem der giver. Giveren går én plads videre efter hver runde, også ved alle pas. "Skift" flytter giveren, hvis bordet og appen er uenige (gemmes som `firstDealer`).
+10. Backup og gendannelse (`/backup`, link nederst på forsiden): alle spil og egne regelsæt gemmes som JSON via dele-menuen (`expo-file-system` + `expo-sharing`). Gendannelse fletter uden at slette noget, og ved samme spil vinder den nyeste `updatedAt`. Webudgaven (`backupFile.web.ts`) downloader og vælger fil i browseren.
 
 ## Vigtige beslutninger og antagelser
 - **4 spillere:** Ingen af kilderne beskriver es-makker whist med 5 spillere, så muligheden er fjernet. Motoren understøtter stadig `seated` pr. runde.
@@ -49,13 +51,12 @@ En dansk **pointtæller til es-makker whist** i App Store (og senere Google Play
 - **Ikke med endnu (husregler):** at gå med i en vip eller en sol, kvarte, stærke, jernhånd.
 
 ## Næste skridt (forslag)
-1. **Test ved et rigtigt bord** i Expo Go og ret det, der føles langsomt eller forkert.
+1. **Test ved et rigtigt bord** i Expo Go og ret det, der føles langsomt eller forkert. Afprøv især på telefonen: backup via dele-menuen og hent fra Filer, sletning af runde/spil (bekræftelsesdialogen virker ikke på web).
 2. App-ikon, splash og endeligt navn. `assets/` indeholder stadig Expos standardbilleder.
 3. Deling af resultatet, fx som billede eller tekst efter afregningen.
-4. Backup/eksport af data (alt ligger kun på telefonen).
-5. Bordvisning til iPad.
-6. Husregler (se ovenfor), hvis gruppen bruger dem.
-7. Når udviklerkontoen er købt:
+4. Bordvisning til iPad.
+5. Husregler (se ovenfor), hvis gruppen bruger dem.
+6. Når udviklerkontoen er købt:
    - `eas.json` og EAS Build
    - TestFlight
    - App Store-side med skærmbilleder og privatlivserklæring ("indsamler ingen data")

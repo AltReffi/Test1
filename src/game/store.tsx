@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Round, ScoringSystem } from "@/scoring";
+import { mergeBackup, type Backup, type MergeResult } from "./backup";
 import type { Game } from "./model";
 
 const GAMES_KEY = "whist:games:v1";
@@ -21,6 +22,8 @@ interface GamesContextValue {
   /** Opret eller opdater et eget regelsæt (matcher på id). */
   saveCustomSystem: (system: ScoringSystem) => void;
   deleteCustomSystem: (id: string) => void;
+  /** Flet en backup ind uden at slette noget. */
+  importBackup: (backup: Backup) => MergeResult;
 }
 
 const GamesContext = createContext<GamesContextValue | null>(null);
@@ -79,6 +82,12 @@ export function GamesProvider({ children }: { children: ReactNode }) {
           prev.some((s) => s.id === system.id) ? prev.map((s) => (s.id === system.id ? system : s)) : [...prev, system],
         ),
       deleteCustomSystem: (id) => setCustomSystems((prev) => prev.filter((s) => s.id !== id)),
+      importBackup: (backup) => {
+        const result = mergeBackup(games, customSystems, backup);
+        setGames(result.games);
+        setCustomSystems(result.customSystems);
+        return result;
+      },
     }),
     [games, customSystems, loaded, mutateGame],
   );
