@@ -42,6 +42,7 @@ En dansk **pointtæller til es-makker whist** i App Store (og senere Google Play
 10. Backup og gendannelse (`/backup`, link nederst på forsiden): alle spil og egne regelsæt gemmes som JSON via dele-menuen (`expo-file-system` + `expo-sharing`). Gendannelse fletter uden at slette noget, og ved samme spil vinder den nyeste `updatedAt`. Webudgaven (`backupFile.web.ts`) downloader og vælger fil i browseren.
 11. "Del resultat" på afregningen: stilling og evt. hvem betaler hvem som tekst via React Natives `Share` (ingen ekstra pakke). Teksten bygges i `src/game/shareText.ts`. `formatPoints` og `formatKroner` ligger i `src/scoring/` og bruger rigtigt minustegn (U+2212).
 12. App Store-forberedelse (`docs/appstore/`): `eas.json`, bundle ID og eksportoplysninger i `app.json`, butikstekster, privatlivspolitik og kladder til skærmbilleder. Tjeklisten i `docs/appstore/README.md` siger, hvad der mangler.
+13. App-ikon (spar es på grønt filt), Android-lag inkl. monokromt temaikon, splash (`expo-splash-screen`, grøn baggrund) og favicon. SVG-kilder i `assets/kilde/`, og `scripts/icon/build-icons.js` laver PNG'erne igen. Expo Go viser app-ikonet i stedet for splash, så splash ses først i et rigtigt build.
 
 ## Vigtige beslutninger og antagelser
 - **4 spillere:** Ingen af kilderne beskriver es-makker whist med 5 spillere, så muligheden er fjernet. Motoren understøtter stadig `seated` pr. runde.
@@ -55,7 +56,7 @@ En dansk **pointtæller til es-makker whist** i App Store (og senere Google Play
 
 ## Næste skridt (forslag)
 1. **Test ved et rigtigt bord** i Expo Go og ret det, der føles langsomt eller forkert. Afprøv især på telefonen: backup via dele-menuen og hent fra Filer, "Del resultat" til Beskeder/Messenger, sletning af runde/spil (bekræftelsesdialogen virker ikke på web).
-2. App-ikon, splash og endeligt navn. `assets/` indeholder stadig Expos standardbilleder. Bundle ID (`dk.whistregnskab.app`) skal godkendes, før første build, fordi det ikke kan ændres bagefter.
+2. Endeligt navn. Bundle ID (`dk.whistregnskab.app`) skal godkendes, før første build, fordi det ikke kan ændres bagefter.
 3. Deling som billede (kræver en pakke, der skal tjekkes for Expo Go), hvis tekst ikke er nok.
 4. Bordvisning til iPad.
 5. Husregler (se ovenfor), hvis gruppen bruger dem.

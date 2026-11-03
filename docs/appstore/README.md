@@ -5,7 +5,7 @@ Alt, der kan forberedes uden Apples udviklerkonto. Tekster til App Store Connect
 ## Skal besluttes før første build
 - [ ] **Bundle ID:** sat til `dk.whistregnskab.app` i `app.json`. Det kan **ikke ændres**, når appen er oprettet i App Store Connect. Ret det nu, hvis du vil have et andet.
 - [ ] **Navn:** "Whist Regnskab" (højst 30 tegn). Navnet skal være ledigt i App Store. Det kan ændres senere, men kun sammen med en ny version.
-- [ ] **App-ikon:** `assets/icon.png` er stadig Expos standardikon. Det skal være 1024 × 1024 px, PNG uden gennemsigtighed.
+- [x] **App-ikon:** spar es på grønt filt (forslag A). Kilderne ligger i `assets/kilde/` og `scripts/icon/`.
 - [ ] **Kontakt-e-mail** i privatlivspolitikken (`[din e-mail]`).
 - [ ] **Hvor privatlivspolitikken ligger:** App Store kræver en offentlig URL. GitHub Pages kræver et offentligt repo (eller betalt GitHub). Alternativer er en offentlig Notion-side eller Google Sites.
 
