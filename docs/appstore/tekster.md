@@ -64,10 +64,10 @@ Hvis gennemgangen spørger til kronerne, kan du svare: *"Appen er en pointtælle
 **Data indsamles ikke.** Appen har ingen server, ingen analyse, ingen reklamer og intet login. Alt gemmes lokalt med AsyncStorage.
 
 ## Privatlivspolitik-URL
-Skal være offentlig. Se [privatlivspolitik.md](privatlivspolitik.md).
+https://gist.github.com/AltReffi/5addbfeccd0e037f622daeac9a81b320
 
 ## Support-URL
-Påkrævet. Kan være den samme side som privatlivspolitikken, med en kontakt-e-mail.
+https://gist.github.com/AltReffi/5addbfeccd0e037f622daeac9a81b320 (samme side som privatlivspolitikken, med kontakt-e-mail).
 
 ## Pris
 29 kr. Vælg det prisniveau, der giver 29 kr. i Danmark. Ingen køb i appen.

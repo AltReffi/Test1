@@ -7,7 +7,7 @@ Alt, der kan forberedes uden Apples udviklerkonto. Tekster til App Store Connect
 - [x] **Navn:** "Whist Regnskab" (godkendt) (højst 30 tegn). Navnet skal være ledigt i App Store. Det kan ændres senere, men kun sammen med en ny version.
 - [x] **App-ikon:** spar es på grønt filt (forslag A). Kilderne ligger i `assets/kilde/` og `scripts/icon/`.
 - [x] **Kontakt-e-mail** i privatlivspolitikken (NorthdockTools@proton.me).
-- [ ] **Hvor privatlivspolitikken ligger:** App Store kræver en offentlig URL. GitHub Pages kræver et offentligt repo (eller betalt GitHub). Alternativer er en offentlig Notion-side eller Google Sites.
+- [x] **Hvor privatlivspolitikken ligger:** offentlig GitHub Gist: https://gist.github.com/AltReffi/5addbfeccd0e037f622daeac9a81b320. Ændres `privatlivspolitik.md`, så opdater gisten med `gh gist edit 5addbfeccd0e037f622daeac9a81b320 docs/appstore/privatlivspolitik.md`.
 
 ## Valgt i konfigurationen
 | Indstilling | Værdi | Hvorfor |
