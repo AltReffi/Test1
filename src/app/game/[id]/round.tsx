@@ -1,9 +1,9 @@
 import * as Haptics from "expo-haptics";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useRef, useState } from "react";
+import { Alert, ScrollView, StyleSheet, Text, View, type ScrollViewInstance } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { scoreRound, trumpBidValue, trumpOutcome, type SolKind } from "@/scoring";
+import { scoreRound, trumpBidValue, trumpOutcome, type PlayerId, type SolKind } from "@/scoring";
 import {
   PAHAENG_OPTIONS,
   SOL_LABELS,
@@ -15,7 +15,7 @@ import {
   type RoundDraft,
 } from "@/game/model";
 import { useGames } from "@/game/store";
-import { Button, Chip, ChipRow, Points, Section } from "@/ui/components";
+import { Button, Chip, ChipGrid, ChipRow, Points, Section } from "@/ui/components";
 import { formatPoints, useTheme } from "@/ui/theme";
 
 const LEVELS = [7, 8, 9, 10, 11, 12, 13];
@@ -34,6 +34,7 @@ export default function RoundScreen() {
   const existing = editIndex !== null ? game?.rounds[editIndex] : undefined;
 
   const [draft, setDraft] = useState<RoundDraft>(() => (existing ? draftFromRound(existing) : emptyDraft()));
+  const scrollRef = useRef<ScrollViewInstance>(null);
 
   if (!game) return null;
   const system = gameSystem(game);
@@ -76,6 +77,12 @@ export default function RoundScreen() {
     ]);
   };
 
+  // Stik er det sidste valg. Rul dem frem, når makker er valgt, så de ikke gemmer sig under kanten.
+  const choosePartner = (partner: PlayerId | "self") => {
+    update({ partner });
+    if (draft.tricks === null) setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 50);
+  };
+
   const setSol = (player: string, kind: SolKind | null) =>
     setDraft((d) => {
       const sols = { ...d.sols };
@@ -87,14 +94,14 @@ export default function RoundScreen() {
   return (
     <View style={{ flex: 1 }}>
       <Stack.Screen options={{ title: editIndex !== null ? `Ret runde ${editIndex + 1}` : `Runde ${game.rounds.length + 1}` }} />
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <Section title="Spil">
+      <ScrollView ref={scrollRef} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <View style={styles.typeRow}>
           <ChipRow>
             <Chip label="Melding" selected={draft.type === "trump"} onPress={() => update({ type: "trump" })} wide />
             <Chip label="Sol" selected={draft.type === "sol"} onPress={() => update({ type: "sol" })} wide />
             <Chip label="Alle pas" selected={draft.type === "pass"} onPress={() => update({ type: "pass" })} wide />
           </ChipRow>
-        </Section>
+        </View>
 
         {draft.type === "trump" && (
           <>
@@ -112,16 +119,17 @@ export default function RoundScreen() {
             </Section>
 
             <Section title="Melding">
-              <ChipRow>
+              <ChipGrid columns={LEVELS.length}>
                 {LEVELS.map((l) => (
-                  <Chip key={l} label={String(l)} selected={draft.level === l} onPress={() => update({ level: l })} />
+                  <Chip key={l} label={String(l)} selected={draft.level === l} onPress={() => update({ level: l })} compact />
                 ))}
-              </ChipRow>
-              <View style={{ height: 8 }} />
-              <ChipRow>
+              </ChipGrid>
+              <View style={{ height: 6 }} />
+              <ChipGrid columns={PAHAENG_OPTIONS.length}>
                 {PAHAENG_OPTIONS.map((p) => (
                   <Chip
                     key={p}
+                    compact
                     label={p === "ingen" ? "Alm." : capitalize(p)}
                     selected={draft.pahaeng === p}
                     onPress={() =>
@@ -133,7 +141,7 @@ export default function RoundScreen() {
                     }
                   />
                 ))}
-              </ChipRow>
+              </ChipGrid>
               {ladder && <Text style={[styles.ladder, { color: t.textMuted }]}>{ladder}</Text>}
             </Section>
 
@@ -161,18 +169,18 @@ export default function RoundScreen() {
                 {seated
                   .filter((p) => p !== draft.bidder)
                   .map((p) => (
-                    <Chip key={p} label={p} selected={draft.partner === p} onPress={() => update({ partner: p })} />
+                    <Chip key={p} label={p} selected={draft.partner === p} onPress={() => choosePartner(p)} />
                   ))}
-                <Chip label="Selvmakker" selected={draft.partner === "self"} onPress={() => update({ partner: "self" })} />
+                <Chip label="Selvmakker" selected={draft.partner === "self"} onPress={() => choosePartner("self")} />
               </ChipRow>
             </Section>
 
             <Section title="Stik taget af melderens side">
-              <ChipRow>
+              <ChipGrid columns={7}>
                 {TRICKS.map((n) => (
-                  <Chip key={n} label={String(n)} selected={draft.tricks === n} onPress={() => update({ tricks: n })} />
+                  <Chip key={n} label={String(n)} selected={draft.tricks === n} onPress={() => update({ tricks: n })} compact />
                 ))}
-              </ChipRow>
+              </ChipGrid>
             </Section>
           </>
         )}
@@ -227,7 +235,8 @@ export default function RoundScreen() {
 
 const styles = StyleSheet.create({
   container: { padding: 16, paddingBottom: 32 },
-  ladder: { marginTop: 10, fontSize: 14 },
+  typeRow: { marginBottom: 20 },
+  ladder: { marginTop: 8, fontSize: 14 },
   footer: { borderTopWidth: StyleSheet.hairlineWidth, paddingHorizontal: 16, paddingTop: 12, gap: 10 },
   preview: { flexDirection: "row", gap: 6 },
   previewCell: { flex: 1, minWidth: 0, alignItems: "center" },

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Children, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View, type ViewStyle } from "react-native";
 import { formatPoints, useTheme } from "./theme";
 
@@ -19,18 +19,47 @@ export function ChipRow({ children }: { children: ReactNode }) {
   return <View style={styles.chipRow}>{children}</View>;
 }
 
+/**
+ * Chips i et fast antal kolonner med lige brede felter, fx meldinger 7–13 på én linje.
+ * Fylder mindre i højden end ChipRow, så rundeskærmen kan ses uden at rulle.
+ */
+export function ChipGrid({ columns, children }: { columns: number; children: ReactNode }) {
+  const items = Children.toArray(children);
+  const rows: ReactNode[][] = [];
+  for (let i = 0; i < items.length; i += columns) rows.push(items.slice(i, i + columns));
+  return (
+    <View style={styles.grid}>
+      {rows.map((row, r) => (
+        <View key={r} style={styles.gridRow}>
+          {row.map((item, c) => (
+            <View key={c} style={styles.gridCell}>
+              {item}
+            </View>
+          ))}
+          {Array.from({ length: columns - row.length }, (_, c) => (
+            <View key={`tom-${c}`} style={styles.gridCell} />
+          ))}
+        </View>
+      ))}
+    </View>
+  );
+}
+
 export function Chip({
   label,
   selected,
   onPress,
   disabled,
   wide,
+  compact,
 }: {
   label: string;
   selected?: boolean;
   onPress: () => void;
   disabled?: boolean;
   wide?: boolean;
+  /** Til ChipGrid: ingen minimumsbredde og lille indre margen. */
+  compact?: boolean;
 }) {
   const t = useTheme();
   return (
@@ -42,6 +71,7 @@ export function Chip({
       style={({ pressed }) => [
         styles.chip,
         wide && styles.chipWide,
+        compact && styles.chipCompact,
         {
           backgroundColor: selected ? t.accent : t.surface,
           borderColor: selected ? t.accent : t.border,
@@ -103,6 +133,10 @@ const styles = StyleSheet.create({
   chipRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   chip: { minWidth: 48, minHeight: 44, paddingHorizontal: 14, borderRadius: 10, borderWidth: 1, alignItems: "center", justifyContent: "center" },
   chipWide: { flexGrow: 1 },
+  chipCompact: { minWidth: 0, paddingHorizontal: 2 },
+  grid: { gap: 6 },
+  gridRow: { flexDirection: "row", gap: 6 },
+  gridCell: { flex: 1, minWidth: 0 },
   chipText: { fontSize: 16, fontWeight: "600" },
   button: { minHeight: 52, borderRadius: 12, borderWidth: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: 20 },
   buttonText: { fontSize: 17, fontWeight: "700" },

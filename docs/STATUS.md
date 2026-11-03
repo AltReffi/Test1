@@ -36,7 +36,8 @@ En dansk **pointtæller til es-makker whist** i App Store (og senere Google Play
    - selvmakker, som makker og sol
    - bedste og værste runde
    - makkerpar
-7. Egne regelsæt i appen, som gemmes til nye spil. Reglerne kan også rettes i et igangværende spil, hvorefter alle runder regnes om. Ændringer, der gør tidligere runder ugyldige, afvises.
+7. Prøvespil i browseren (iPhone 13 og iPhone SE, 20 runder): en almindelig melding tager 6 tryk inkl. "Ny runde" og "Gem". Rundeskærmen er gjort kompakt (meldinger, påhæng og stik i faste kolonner), og den ruller selv stikkene frem, når makker er valgt.
+8. Egne regelsæt i appen, som gemmes til nye spil. Reglerne kan også rettes i et igangværende spil, hvorefter alle runder regnes om. Ændringer, der gør tidligere runder ugyldige, afvises.
 
 ## Vigtige beslutninger og antagelser
 - **4 spillere:** Ingen af kilderne beskriver es-makker whist med 5 spillere, så muligheden er fjernet. Motoren understøtter stadig `seated` pr. runde.
@@ -75,4 +76,5 @@ Browsertest: start `npx expo start --web --port 8081` og kør Playwright med `de
 - **Lint (`react-hooks`):**
   - forbyder `Date.now()` under render. Læg det i model-funktioner.
   - forbyder `setState` i effects. Brug mønsteret, hvor tilstanden justeres under render (se `NumberField` i `RuleEditor.tsx`, som sammenligner med `Object.is` på grund af NaN).
-- **`pkill -f "expo start"` kan dræbe den shell, der kører kommandoen.** Brug mønsteret `pkill -f "[e]xpo start --web"`.
+- **`pkill -f "expo start"` kan dræbe den shell, der kører kommandoen.** Brug mønsteret `pkill -f "[e]xpo start --web"`, og start aldrig Expo igen i samme kommando (så matcher mønsteret kommandoen selv).
+- **`CI=1 npx expo start` overvåger ikke filer.** Efter en kodeændring serveres den gamle bundle, indtil Metro genstartes.

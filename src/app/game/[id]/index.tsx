@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
   empty: { textAlign: "center", marginTop: 24, fontSize: 16 },
   row: { borderBottomWidth: StyleSheet.hairlineWidth, paddingVertical: 10, gap: 6 },
   rowTitle: { fontSize: 15 },
-  deltaRow: { flexDirection: "row", gap: 6 },
+  // Samme vandrette indryk som stillingskortet (kant 1 + padding 14), så kolonnerne flugter.
+  deltaRow: { flexDirection: "row", gap: 6, paddingHorizontal: 15 },
   footer: { flexDirection: "row", gap: 10, padding: 16, paddingBottom: 32, borderTopWidth: StyleSheet.hairlineWidth },
 });
