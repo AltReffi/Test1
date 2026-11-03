@@ -36,5 +36,5 @@ export function settle(totals: Deltas, oerePerPoint: number): Transfer[] {
 }
 
 export function formatKroner(oere: number): string {
-  return `${(oere / 100).toFixed(2).replace(".", ",")} kr.`;
+  return `${(oere / 100).toFixed(2).replace(".", ",").replace(/^-/, "\u2212")} kr.`;
 }

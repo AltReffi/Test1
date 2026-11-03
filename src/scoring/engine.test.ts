@@ -223,3 +223,14 @@ describe("validering af regelsæt", () => {
     expect(trumpOutcome(sys, bid(8), 9)).toBe(20);
   });
 });
+
+describe("formatering", () => {
+  it("bruger rigtigt minustegn og dansk komma", async () => {
+    const { formatKroner, formatPoints } = await import("./index");
+    expect(formatPoints(1340)).toBe("+1.340");
+    expect(formatPoints(-380)).toBe("−380");
+    expect(formatPoints(0)).toBe("0");
+    expect(formatKroner(-600)).toBe("−6,00 kr.");
+    expect(formatKroner(1250)).toBe("12,50 kr.");
+  });
+});

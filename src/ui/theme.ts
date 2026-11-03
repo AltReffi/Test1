@@ -32,9 +32,4 @@ export function useTheme(): Theme {
   return useColorScheme() === "dark" ? dark : light;
 }
 
-export function formatPoints(n: number): string {
-  const rounded = Math.round(n * 10) / 10;
-  const s = rounded.toLocaleString("da-DK");
-  // Rigtigt minustegn (U+2212) er lige så bredt som plus og står tættere på tallet.
-  return rounded > 0 ? `+${s}` : s.replace(/^-/, "\u2212");
-}
+export { formatPoints } from "@/scoring/format";

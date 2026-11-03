@@ -1,9 +1,11 @@
 import { useLocalSearchParams } from "expo-router";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { formatKroner, settle, totals } from "@/scoring";
 import { gameSystem, stakeLabel, stakeOere } from "@/game/model";
+import { resultText } from "@/game/shareText";
 import { useGames } from "@/game/store";
-import { Points, Section } from "@/ui/components";
+import { Button, Points, Section } from "@/ui/components";
 import { MoneyPicker } from "@/ui/MoneyPicker";
 import { useTheme } from "@/ui/theme";
 
@@ -12,7 +14,17 @@ export default function SettleScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getGame, updateGame } = useGames();
   const game = getGame(id);
+  const [shareError, setShareError] = useState<string | null>(null);
   if (!game) return null;
+
+  const share = async () => {
+    setShareError(null);
+    try {
+      await Share.share({ message: resultText(game) });
+    } catch {
+      setShareError("Deling er ikke tilgængelig her.");
+    }
+  };
 
   const score = totals(gameSystem(game), game.players, game.rounds);
   const ranked = [...game.players].sort((a, b) => (score[b] ?? 0) - (score[a] ?? 0));
@@ -56,12 +68,15 @@ export default function SettleScreen() {
           <Text style={[styles.help, { color: t.textMuted }]}>{stakeLabel(stake)} pr. point. Færrest mulige overførsler.</Text>
         </Section>
       )}
+
+      <Button label="Del resultat" variant="secondary" onPress={share} />
+      {shareError && <Text style={[styles.help, { color: t.negative, textAlign: "center" }]}>{shareError}</Text>}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16 },
+  container: { padding: 16, paddingBottom: 48 },
   row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth },
   name: { fontSize: 17, fontWeight: "600" },
   amount: { fontSize: 17, fontWeight: "700", fontVariant: ["tabular-nums"] },
