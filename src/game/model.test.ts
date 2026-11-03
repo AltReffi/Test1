@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { JEBERG, WHIST_DK } from "@/scoring";
 import {
-  defaultSittingOut,
   describeRound,
   draftFromRound,
   emptyDraft,
@@ -11,25 +10,20 @@ import {
 } from "./model";
 
 const four = ["Anna", "Bo", "Carl", "Dorte"];
-const five = [...four, "Erik"];
 
 describe("spillere", () => {
-  it("kræver 4–5 unikke navne", () => {
+  it("kræver præcis 4 unikke navne", () => {
     expect(validatePlayers(["A", "B", "C"])).not.toBeNull();
     expect(validatePlayers(["A", "B", "C", "a"])).not.toBeNull();
-    expect(validatePlayers(["A", "B", "C", "D", " "])).toBeNull();
-    expect(validatePlayers(["A", "B", "C", "D", "E", "F"])).not.toBeNull();
-  });
-
-  it("med 5 spillere sidder én over på skift", () => {
-    expect(defaultSittingOut(four, 3)).toBeNull();
-    expect([0, 1, 5].map((i) => defaultSittingOut(five, i))).toEqual(["Anna", "Bo", "Anna"]);
+    expect(validatePlayers(["A", "B", "C", "D"])).toBeNull();
+    expect(validatePlayers(["A", "B", "C", "D", "E"])).not.toBeNull();
+    expect(validatePlayers([" A ", "B", "C", "D"])).toBeNull();
   });
 });
 
 describe("udkast → runde", () => {
   it("fortæller hvad der mangler", () => {
-    const d = emptyDraft(four, 0);
+    const d = emptyDraft();
     expect(roundFromDraft(four, WHIST_DK, d)).toEqual({ ok: false, missing: "Vælg melder" });
     d.bidder = "Anna";
     d.level = 8;
@@ -44,28 +38,26 @@ describe("udkast → runde", () => {
   });
 
   it("vip og trumf gemmes kun i systemer der bruger dem", () => {
-    const d = { ...emptyDraft(four, 0), bidder: "Anna", partner: "Bo" as const, level: 9, pahaeng: "halve" as const, vips: 3, trump: "klør" as const, tricks: 9 };
+    const d = { ...emptyDraft(), bidder: "Anna", partner: "Bo" as const, level: 9, pahaeng: "halve" as const, vips: 3, trump: "klør" as const, tricks: 9 };
     const plain = roundFromDraft(four, WHIST_DK, d);
     const jeberg = roundFromDraft(four, JEBERG, d);
     expect(plain.ok && plain.round.type === "trump" && plain.round.bid).toEqual({ level: 9, pahaeng: "halve" });
     expect(jeberg.ok && jeberg.round.type === "trump" && jeberg.round.bid).toEqual({ level: 9, pahaeng: "halve", vips: 3, trump: "klør" });
   });
 
-  it("sol: spillere der sidder over tæller ikke med", () => {
-    const d = emptyDraft(five, 4); // Erik sidder over
-    d.type = "sol";
-    d.sols = { Erik: { kind: "sol", success: true } };
-    expect(roundFromDraft(five, WHIST_DK, d)).toEqual({ ok: false, missing: "Vælg hvem der meldte sol" });
+  it("sol skal have mindst én melder, og meldingen skal findes i regelsættet", () => {
+    const d = { ...emptyDraft(), type: "sol" as const };
+    expect(roundFromDraft(four, WHIST_DK, d)).toEqual({ ok: false, missing: "Vælg hvem der meldte sol" });
     d.sols = { Bo: { kind: "renBordlaegger", success: true } };
-    expect(roundFromDraft(five, JEBERG, d).ok).toBe(false); // findes ikke i jeberg
-    expect(roundFromDraft(five, WHIST_DK, d).ok).toBe(true);
+    expect(roundFromDraft(four, JEBERG, d).ok).toBe(false); // findes ikke i jeberg
+    expect(roundFromDraft(four, WHIST_DK, d).ok).toBe(true);
   });
 
   it("runde → udkast → runde giver det samme", () => {
-    const d = { ...emptyDraft(five, 1), bidder: "Carl", partner: "Erik" as const, level: 10, pahaeng: "sans" as const, tricks: 11 };
-    const r = roundFromDraft(five, WHIST_DK, d);
+    const d = { ...emptyDraft(), bidder: "Carl", partner: "Dorte" as const, level: 10, pahaeng: "sans" as const, tricks: 11 };
+    const r = roundFromDraft(four, WHIST_DK, d);
     if (!r.ok) throw new Error(r.missing);
-    expect(roundFromDraft(five, WHIST_DK, draftFromRound(five, r.round))).toEqual(r);
+    expect(roundFromDraft(four, WHIST_DK, draftFromRound(r.round))).toEqual(r);
   });
 });
 

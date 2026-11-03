@@ -23,12 +23,13 @@ npx expo start
    Tryk `i` i terminalen for at åbne appen i iOS-simulatoren i stedet, eller `w` for browseren.
 
 ## Det kan appen
-- 4–5 spillere. Med 5 sidder giveren over på skift, og det kan ændres pr. runde.
+- 4 spillere, som i es-makker whist.
 - Valg af regelsæt (se nedenfor) og indsats pr. point.
 - Indtastning af en runde: melder, melding og påhæng, makker eller selvmakker, og antal stik. Pointene vises, mens du vælger.
 - Sol, ren sol, bordlægger og ren bordlægger, også flere solmeldinger i samme spil.
 - Stillingstavle med alle runder. Tryk på en runde for at rette eller slette den.
 - Afregning i kroner med færrest mulige overførsler.
+- Statistik over alle spil (altid, i år, 30 dage): samlet stilling, sejre, hvor ofte meldinger går hjem, om man melder for højt eller lavt, selvmakker, sol, bedste og værste runde og de bedste makkerpar. Spillere genkendes på navnet.
 - Alt gemmes lokalt på telefonen. Ingen konto og ingen server.
 
 ## Struktur

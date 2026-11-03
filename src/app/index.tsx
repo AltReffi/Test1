@@ -18,7 +18,12 @@ export default function HomeScreen() {
 
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.container}>
-      <Button label="Nyt spil" onPress={() => router.push("/new")} />
+      <View style={styles.actions}>
+        {games.some((g) => g.rounds.length > 0) && (
+          <Button label="Statistik" variant="secondary" onPress={() => router.push("/stats")} style={{ flex: 1 }} />
+        )}
+        <Button label="Nyt spil" onPress={() => router.push("/new")} style={{ flex: 2 }} />
+      </View>
 
       {loaded && games.length === 0 && (
         <Text style={[styles.empty, { color: t.textMuted }]}>
@@ -65,6 +70,7 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: { padding: 16, gap: 12 },
+  actions: { flexDirection: "row", gap: 10 },
   empty: { textAlign: "center", marginTop: 32, fontSize: 16, lineHeight: 22 },
   card: { borderWidth: 1, borderRadius: 14, padding: 14, gap: 10 },
   cardHeader: { gap: 2 },

@@ -33,14 +33,12 @@ export default function RoundScreen() {
   const editIndex = params.index !== undefined ? Number(params.index) : null;
   const existing = editIndex !== null ? game?.rounds[editIndex] : undefined;
 
-  const [draft, setDraft] = useState<RoundDraft>(() =>
-    game ? (existing ? draftFromRound(game.players, existing) : emptyDraft(game.players, game.rounds.length)) : emptyDraft([], 0),
-  );
+  const [draft, setDraft] = useState<RoundDraft>(() => (existing ? draftFromRound(existing) : emptyDraft()));
 
   if (!game) return null;
   const system = systemById(game.systemId);
   const perDoubling = system.pahaengMode === "perDoubling";
-  const seated = game.players.filter((p) => p !== draft.sittingOut);
+  const seated = game.players;
   const update = (patch: Partial<RoundDraft>) => setDraft((d) => ({ ...d, ...patch }));
 
   const result = roundFromDraft(game.players, system, draft);
@@ -90,27 +88,6 @@ export default function RoundScreen() {
     <View style={{ flex: 1 }}>
       <Stack.Screen options={{ title: editIndex !== null ? `Ret runde ${editIndex + 1}` : `Runde ${game.rounds.length + 1}` }} />
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        {game.players.length > 4 && (
-          <Section title="Sidder over">
-            <ChipRow>
-              {game.players.map((p) => (
-                <Chip
-                  key={p}
-                  label={p}
-                  selected={draft.sittingOut === p}
-                  onPress={() =>
-                    update({
-                      sittingOut: p,
-                      bidder: draft.bidder === p ? null : draft.bidder,
-                      partner: draft.partner === p ? null : draft.partner,
-                    })
-                  }
-                />
-              ))}
-            </ChipRow>
-          </Section>
-        )}
-
         <Section title="Spil">
           <ChipRow>
             <Chip label="Melding" selected={draft.type === "trump"} onPress={() => update({ type: "trump" })} wide />

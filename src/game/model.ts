@@ -12,8 +12,8 @@ import {
   type Trump,
 } from "@/scoring";
 
-export const MIN_PLAYERS = 4;
-export const MAX_PLAYERS = 5;
+/** Es-makker whist spilles af præcis fire spillere. */
+export const PLAYER_COUNT = 4;
 
 export interface Game {
   id: string;
@@ -37,32 +37,20 @@ export function newGameId(): string {
 /** Rens og valider spillernavne. Returnerer fejlbesked eller null. */
 export function validatePlayers(names: string[]): string | null {
   const trimmed = names.map((n) => n.trim()).filter((n) => n.length > 0);
-  if (trimmed.length < MIN_PLAYERS) return `Der skal være mindst ${MIN_PLAYERS} spillere.`;
-  if (trimmed.length > MAX_PLAYERS) return `Der kan højst være ${MAX_PLAYERS} spillere.`;
+  if (trimmed.length !== PLAYER_COUNT) return `Der skal være ${PLAYER_COUNT} spillere.`;
   const lower = trimmed.map((n) => n.toLocaleLowerCase("da"));
   if (new Set(lower).size !== lower.length) return "To spillere har samme navn.";
   return null;
 }
 
-/**
- * Hvem sidder over i runde nr. `roundIndex` (0-baseret)?
- * Med 5 spillere går det på skift (giveren sidder over). Med 4 sidder ingen over.
- */
-export function defaultSittingOut(players: PlayerId[], roundIndex: number): PlayerId | null {
-  if (players.length <= 4) return null;
-  return players[roundIndex % players.length] ?? null;
-}
-
-export function seatedPlayers(players: PlayerId[], sittingOut: PlayerId | null): [PlayerId, PlayerId, PlayerId, PlayerId] {
-  const seated = players.filter((p) => p !== sittingOut);
-  if (seated.length !== 4) throw new ScoringError("Der skal sidde præcis fire spillere ved bordet.");
-  return seated as [PlayerId, PlayerId, PlayerId, PlayerId];
+export function seatedPlayers(players: PlayerId[]): [PlayerId, PlayerId, PlayerId, PlayerId] {
+  if (players.length !== PLAYER_COUNT) throw new ScoringError("Der skal være præcis fire spillere.");
+  return players as [PlayerId, PlayerId, PlayerId, PlayerId];
 }
 
 /** Udkast fra indtastningsskærmen. Felter er null, indtil brugeren har valgt dem. */
 export interface RoundDraft {
   type: "trump" | "sol" | "pass";
-  sittingOut: PlayerId | null;
   bidder: PlayerId | null;
   /** "self" = selvmakker. */
   partner: PlayerId | "self" | null;
@@ -74,10 +62,9 @@ export interface RoundDraft {
   sols: Partial<Record<PlayerId, { kind: SolKind; success: boolean }>>;
 }
 
-export function emptyDraft(players: PlayerId[], roundIndex: number): RoundDraft {
+export function emptyDraft(): RoundDraft {
   return {
     type: "trump",
-    sittingOut: defaultSittingOut(players, roundIndex),
     bidder: null,
     partner: null,
     level: null,
@@ -89,10 +76,8 @@ export function emptyDraft(players: PlayerId[], roundIndex: number): RoundDraft 
   };
 }
 
-export function draftFromRound(players: PlayerId[], round: Round): RoundDraft {
-  const sittingOut = players.find((p) => !round.seated.includes(p)) ?? null;
-  const base = emptyDraft(players, 0);
-  base.sittingOut = sittingOut;
+export function draftFromRound(round: Round): RoundDraft {
+  const base = emptyDraft();
   if (round.type === "pass") return { ...base, type: "pass" };
   if (round.type === "sol") {
     const sols: RoundDraft["sols"] = {};
@@ -118,9 +103,9 @@ export type DraftResult = { ok: true; round: Round } | { ok: false; missing: str
 export function roundFromDraft(players: PlayerId[], system: ScoringSystem, draft: RoundDraft): DraftResult {
   let seated: [PlayerId, PlayerId, PlayerId, PlayerId];
   try {
-    seated = seatedPlayers(players, draft.sittingOut);
+    seated = seatedPlayers(players);
   } catch {
-    return { ok: false, missing: "Vælg hvem der sidder over" };
+    return { ok: false, missing: "Der skal være præcis fire spillere" };
   }
 
   if (draft.type === "pass") return { ok: true, round: { type: "pass", seated } };

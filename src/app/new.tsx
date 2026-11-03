@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { DEFAULT_SYSTEM, PRESET_SYSTEMS } from "@/scoring";
-import { MAX_PLAYERS, newGameId, validatePlayers } from "@/game/model";
+import { PLAYER_COUNT, newGameId, validatePlayers } from "@/game/model";
 import { useGames } from "@/game/store";
 import { Button, Chip, ChipRow, Section } from "@/ui/components";
 import { useTheme } from "@/ui/theme";
@@ -18,7 +18,7 @@ const STAKES = [
 export default function NewGameScreen() {
   const t = useTheme();
   const { createGame } = useGames();
-  const [names, setNames] = useState<string[]>(Array(MAX_PLAYERS).fill(""));
+  const [names, setNames] = useState<string[]>(Array(PLAYER_COUNT).fill(""));
   const [systemId, setSystemId] = useState(DEFAULT_SYSTEM.id);
   const [oerePerPoint, setOerePerPoint] = useState(0);
 
@@ -43,14 +43,14 @@ export default function NewGameScreen() {
 
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled" contentContainerStyle={styles.container}>
-      <Section title="Spillere (4–5)">
+      <Section title="Spillere">
         <View style={{ gap: 8 }}>
           {names.map((name, i) => (
             <TextInput
               key={i}
               value={name}
               onChangeText={(v) => setNames((prev) => prev.map((n, j) => (j === i ? v : n)))}
-              placeholder={i < 4 ? `Spiller ${i + 1}` : "Spiller 5 (valgfri)"}
+              placeholder={`Spiller ${i + 1}`}
               placeholderTextColor={t.textMuted}
               autoCapitalize="words"
               autoCorrect={false}
@@ -59,7 +59,7 @@ export default function NewGameScreen() {
             />
           ))}
         </View>
-        <Text style={[styles.help, { color: t.textMuted }]}>Skriv dem i den rækkefølge, I sidder. Med fem spillere sidder giveren over på skift.</Text>
+        <Text style={[styles.help, { color: t.textMuted }]}>Skriv dem i den rækkefølge, I sidder.</Text>
       </Section>
 
       <Section title="Regelsæt">
