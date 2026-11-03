@@ -1,6 +1,41 @@
 # Whist-regnskab
 
-Pointtæller til dansk es-makker whist. Denne første del er **pointmotoren**: ren TypeScript uden afhængigheder, så den kan bruges direkte i en Expo-app (React Native).
+Pointtæller til dansk es-makker whist, bygget med Expo (React Native) til iPhone og Android.
+
+## Kør appen på din telefon (Expo Go)
+
+1. Installer **Expo Go** fra App Store på din iPhone.
+2. På din Mac (kræver Node.js 20 eller nyere):
+
+```bash
+git clone https://github.com/AltReffi/Test1.git whist && cd whist
+```
+
+```bash
+git checkout claude/gallant-rubin-hje8da && npm install
+```
+
+```bash
+npx expo start
+```
+
+3. Scan QR-koden med iPhonens kamera. Mac og telefon skal være på samme wifi.
+   Tryk `i` i terminalen for at åbne appen i iOS-simulatoren i stedet, eller `w` for browseren.
+
+## Det kan appen
+- 4–5 spillere. Med 5 sidder giveren over på skift, og det kan ændres pr. runde.
+- Valg af regelsæt (se nedenfor) og indsats pr. point.
+- Indtastning af en runde: melder, melding og påhæng, makker eller selvmakker, og antal stik. Pointene vises, mens du vælger.
+- Sol, ren sol, bordlægger og ren bordlægger, også flere solmeldinger i samme spil.
+- Stillingstavle med alle runder. Tryk på en runde for at rette eller slette den.
+- Afregning i kroner med færrest mulige overførsler.
+- Alt gemmes lokalt på telefonen. Ingen konto og ingen server.
+
+## Struktur
+- `src/scoring/` — pointmotoren (ren TypeScript, testet)
+- `src/game/` — spilmodel og lagring
+- `src/app/` — skærme (Expo Router)
+- `src/ui/` — knapper, chips og farvetema (lyst og mørkt)
 
 ## Valgbare regelsæt
 
@@ -39,9 +74,9 @@ Runder kan have 5+ spillere i spillet. De fire, der sidder med i runden, angives
 ## Kommandoer
 
 ```bash
-npm install
 npm test          # tests, inkl. regneeksemplerne fra jeberg.eu
 npm run typecheck
+npx expo-doctor   # tjek at pakkerne passer til Expo-versionen
 ```
 
 ## Kilder
