@@ -1,6 +1,6 @@
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { describeRound, roundsWithRunningTotals, systemById } from "@/game/model";
+import { describeRound, gameSystem, roundsWithRunningTotals } from "@/game/model";
 import { useGames } from "@/game/store";
 import { Button, Points } from "@/ui/components";
 import { useTheme } from "@/ui/theme";
@@ -19,13 +19,26 @@ export default function GameScreen() {
     );
   }
 
-  const system = systemById(game.systemId);
+  const system = gameSystem(game);
   const rows = roundsWithRunningTotals(system, game);
   const current = rows.at(-1)?.running ?? Object.fromEntries(game.players.map((p) => [p, 0]));
 
   return (
     <View style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: system.name }} />
+      <Stack.Screen
+        options={{
+          title: system.name,
+          headerRight: () => (
+            <Pressable
+              accessibilityRole="button"
+              hitSlop={12}
+              onPress={() => router.push({ pathname: "/game/[id]/rules", params: { id: game.id } })}
+            >
+              <Text style={{ color: t.accent, fontSize: 17, fontWeight: "600" }}>Regler</Text>
+            </Pressable>
+          ),
+        }}
+      />
       <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.container}>
         <View style={[styles.totals, { backgroundColor: t.surface, borderColor: t.border }]}>
           {game.players.map((p) => (

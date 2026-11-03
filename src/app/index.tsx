@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { totals } from "@/scoring";
-import { systemById } from "@/game/model";
+import { gameSystem } from "@/game/model";
 import { useGames } from "@/game/store";
 import { Button, Points } from "@/ui/components";
 import { useTheme } from "@/ui/theme";
@@ -32,7 +32,7 @@ export default function HomeScreen() {
       )}
 
       {games.map((game) => {
-        const system = systemById(game.systemId);
+        const system = gameSystem(game);
         const score = totals(system, game.players, game.rounds);
         const date = new Date(game.createdAt).toLocaleDateString("da-DK", { day: "numeric", month: "short", year: "numeric" });
         return (

@@ -21,13 +21,41 @@ export interface Game {
   updatedAt: number;
   players: PlayerId[];
   systemId: string;
-  /** Øre pr. point ved afregning. 0 = spil uden penge. */
+  /**
+   * Spillets egen kopi af regelsættet. Kan rettes undervejs uden at påvirke andre spil.
+   * Mangler i spil fra før regelsæt kunne rettes — så bruges det forudindstillede `systemId`.
+   */
+  system?: ScoringSystem;
+  /** Indsats i øre pr. point. Huskes, selv når kroner er slået fra. */
   oerePerPoint: number;
+  /** Spil om kroner. Mangler i ældre spil — der betyder oerePerPoint > 0 "til". */
+  moneyEnabled?: boolean;
   rounds: Round[];
 }
 
 export function systemById(id: string): ScoringSystem {
   return PRESET_SYSTEMS.find((s) => s.id === id) ?? DEFAULT_SYSTEM;
+}
+
+/** Regelsættet, et spil regnes efter. */
+export function gameSystem(game: Pick<Game, "systemId" | "system">): ScoringSystem {
+  return game.system ?? systemById(game.systemId);
+}
+
+/** Effektiv indsats i øre pr. point (0 når kroner er slået fra). */
+export function stakeOere(game: Pick<Game, "oerePerPoint" | "moneyEnabled">): number {
+  const enabled = game.moneyEnabled ?? game.oerePerPoint > 0;
+  return enabled ? game.oerePerPoint : 0;
+}
+
+export const STAKE_OPTIONS = [1, 5, 10, 25, 50, 100] as const;
+
+export function stakeLabel(oere: number): string {
+  return oere >= 100 && oere % 100 === 0 ? `${oere / 100} kr.` : `${oere} øre`;
+}
+
+export function newCustomSystemId(): string {
+  return `custom-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
 export function newGameId(): string {
@@ -180,4 +208,54 @@ export function roundsWithRunningTotals(
     for (const [p, d] of Object.entries(deltas)) running[p] = (running[p] ?? 0) + d;
     return { round, deltas, running: { ...running } };
   });
+}
+
+/**
+ * Kan alle runder regnes efter regelsættet? Fx fejler det, hvis en solmelding,
+ * der er brugt i en runde, er slået fra. Returnerer fejlbesked eller null.
+ */
+export function checkRoundsAgainstSystem(system: ScoringSystem, rounds: readonly Round[]): string | null {
+  for (const [i, round] of rounds.entries()) {
+    if (round.type === "sol") {
+      const missing = round.sols.find((s) => system.sol[s.kind] === null);
+      if (missing) return `Runde ${i + 1} bruger ${SOL_LABELS[missing.kind].toLowerCase()}, som er slået fra.`;
+    }
+    try {
+      scoreRound(system, round);
+    } catch (e) {
+      return `Runde ${i + 1} kan ikke regnes: ${(e as Error).message}`;
+    }
+  }
+  return null;
+}
+
+/** Kort opsummering af et regelsæt, fx "7 = 10, ×2 pr. stik · påhæng ×2 · bet ×2 · sol 50/100/150/200". */
+export function summarizeSystem(s: ScoringSystem): string {
+  const n = (x: number) => String(x).replace(".", ",");
+  const pahaeng = s.pahaengMode === "single" ? `påhæng ×${n(s.pahaengFactor)}` : `gode/sans, halve og vip ×${n(s.pahaengFactor)} hver`;
+  const loss = s.lossMode === "flat" ? `bet ×${n(s.lossFactor)}` : `bet ×${n(s.lossFactor)} pr. stik`;
+  const sols = (["sol", "renSol", "bordlaegger", "renBordlaegger"] as const)
+    .map((k) => s.sol[k])
+    .filter((v): v is number => v !== null)
+    .map(n)
+    .join("/");
+  const parts = [`7 = ${n(s.baseRate)}, ×${n(s.stepFactor)} pr. stik`, pahaeng, loss];
+  if (s.slamBonus > 0) parts.push(`stor slem +${n(s.slamBonus)}`);
+  parts.push(sols ? `sol ${sols}` : "ingen sol");
+  return parts.join(" · ");
+}
+
+/** Opret et nyt spil med sin egen kopi af regelsættet. */
+export function createNewGame(players: PlayerId[], system: ScoringSystem, money: { moneyEnabled: boolean; oerePerPoint: number }): Game {
+  const now = Date.now();
+  return {
+    id: newGameId(),
+    createdAt: now,
+    updatedAt: now,
+    players: players.map((p) => p.trim()),
+    systemId: system.id,
+    system,
+    ...money,
+    rounds: [],
+  };
 }

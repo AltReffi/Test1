@@ -14,6 +14,7 @@ import {
   totals,
   trumpBidValue,
   trumpOutcome,
+  validateSystem,
   type Round,
   type TrumpBid,
 } from "./index";
@@ -199,5 +200,26 @@ describe("afregning", () => {
       net[tr.to]! += tr.oere;
     }
     expect(net).toEqual({ Anna: 400, Bo: -100, Carl: -900, Dorte: -900, Erik: 1500 });
+  });
+});
+
+describe("validering af regelsæt", () => {
+  it("de forudindstillede systemer er gyldige", () => {
+    for (const sys of PRESET_SYSTEMS) expect(validateSystem(sys)).toBeNull();
+  });
+
+  it("afviser ugyldige værdier", () => {
+    expect(validateSystem(customizeSystem(WHIST_DK, { name: " " }))).not.toBeNull();
+    expect(validateSystem(customizeSystem(WHIST_DK, { baseRate: 0 }))).not.toBeNull();
+    expect(validateSystem(customizeSystem(WHIST_DK, { stepFactor: 0.5 }))).not.toBeNull();
+    expect(validateSystem(customizeSystem(WHIST_DK, { lossFactor: Number.NaN }))).not.toBeNull();
+    expect(validateSystem(customizeSystem(WHIST_DK, { slamBonus: -1 }))).not.toBeNull();
+    expect(validateSystem(customizeSystem(WHIST_DK, { sol: { sol: 0 } }))).not.toBeNull();
+  });
+
+  it("tillader at slå solmeldinger fra og bruge egne takster", () => {
+    const sys = customizeSystem(WHIST_DK, { name: "Klubben", baseRate: 5, sol: { bordlaegger: null, renBordlaegger: null } });
+    expect(validateSystem(sys)).toBeNull();
+    expect(trumpOutcome(sys, bid(8), 9)).toBe(20);
   });
 });

@@ -82,6 +82,12 @@ describe("statistik", () => {
     expect(computeStats(games, periodStart("year", now)).games).toBe(1);
   });
 
+  it("kroner tæller kun med, når de er slået til", () => {
+    const off = { ...game("g1", 1000, [r.annaMade], seated, 10), moneyEnabled: false };
+    const stats = computeStats([off]);
+    expect(stats.players.every((p) => p.oere === 0)).toBe(true);
+  });
+
   it("procent", () => {
     expect(percent(1, 3)).toBe(33);
     expect(percent(0, 0)).toBeNull();

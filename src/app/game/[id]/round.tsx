@@ -11,7 +11,7 @@ import {
   draftFromRound,
   emptyDraft,
   roundFromDraft,
-  systemById,
+  gameSystem,
   type RoundDraft,
 } from "@/game/model";
 import { useGames } from "@/game/store";
@@ -36,7 +36,7 @@ export default function RoundScreen() {
   const [draft, setDraft] = useState<RoundDraft>(() => (existing ? draftFromRound(existing) : emptyDraft()));
 
   if (!game) return null;
-  const system = systemById(game.systemId);
+  const system = gameSystem(game);
   const perDoubling = system.pahaengMode === "perDoubling";
   const seated = game.players;
   const update = (patch: Partial<RoundDraft>) => setDraft((d) => ({ ...d, ...patch }));

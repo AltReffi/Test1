@@ -24,7 +24,9 @@ npx expo start
 
 ## Det kan appen
 - 4 spillere, som i es-makker whist.
-- Valg af regelsæt (se nedenfor) og indsats pr. point.
+- Valg af regelsæt (se nedenfor). Tryk "Tilpas regler" for at lave jeres egne: grundtakst, faktorer, tabt melding, stor slem og hvilke solmeldinger der bruges og hvad de giver. Egne regelsæt gemmes til næste spil.
+- Ret reglerne i et igangværende spil via "Regler" øverst på stillingstavlen. Alle runder regnes om, og appen stopper dig, hvis en solmelding, der allerede er brugt, slås fra.
+- Kroner kan slås til og fra, både ved nyt spil og under afregningen (1 øre – 1 kr. pr. point). Indsatsen huskes, når kroner er slået fra.
 - Indtastning af en runde: melder, melding og påhæng, makker eller selvmakker, og antal stik. Pointene vises, mens du vælger.
 - Sol, ren sol, bordlægger og ren bordlægger, også flere solmeldinger i samme spil.
 - Stillingstavle med alle runder. Tryk på en runde for at rette eller slette den.

@@ -1,5 +1,5 @@
 import { scoreRound, type PlayerId } from "@/scoring";
-import { systemById, type Game } from "./model";
+import { gameSystem, stakeOere, type Game } from "./model";
 
 /** Spillere genkendes på tværs af spil ud fra navnet (uden forskel på store/små bogstaver). */
 export function playerKey(name: string): string {
@@ -102,7 +102,7 @@ export function computeStats(games: readonly Game[], since = 0): StatsResult {
   for (const game of sorted) {
     gameCount++;
     roundCount += game.rounds.length;
-    const system = systemById(game.systemId);
+    const system = gameSystem(game);
     const get = (name: PlayerId): PlayerStats => {
       const key = playerKey(name);
       let s = players.get(key);
@@ -166,7 +166,7 @@ export function computeStats(games: readonly Game[], since = 0): StatsResult {
     for (const [p, total] of totals) {
       const s = get(p);
       if (total === best) s.wins++;
-      s.oere += Math.round(total * game.oerePerPoint);
+      s.oere += Math.round(total * stakeOere(game));
     }
   }
 

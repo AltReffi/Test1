@@ -61,6 +61,22 @@ export const PRESET_SYSTEMS: readonly ScoringSystem[] = [WHIST_DK, HJERTERES, JE
 
 export const DEFAULT_SYSTEM = WHIST_DK;
 
+/** Tjek at et (brugerrettet) regelsæt kan bruges. Returnerer fejlbesked eller null. */
+export function validateSystem(system: ScoringSystem): string | null {
+  const positive = (n: number) => Number.isFinite(n) && n > 0;
+  if (!system.name.trim()) return "Regelsættet skal have et navn.";
+  if (!positive(system.baseRate)) return "Grundtaksten skal være større end 0.";
+  if (!Number.isFinite(system.stepFactor) || system.stepFactor < 1) return "Faktoren pr. stik skal være mindst 1.";
+  if (!Number.isFinite(system.pahaengFactor) || system.pahaengFactor < 1) return "Faktoren for påhæng skal være mindst 1.";
+  if (!Number.isFinite(system.lossFactor) || system.lossFactor < 1) return "Faktoren for tabt melding skal være mindst 1.";
+  if (!Number.isFinite(system.slamBonus) || system.slamBonus < 0) return "Bonus for stor slem kan ikke være negativ.";
+  if (!Number.isFinite(system.solLossFactor) || system.solLossFactor < 1) return "Faktoren for tabt sol skal være mindst 1.";
+  for (const value of Object.values(system.sol)) {
+    if (value !== null && !positive(value)) return "Solværdier skal være større end 0.";
+  }
+  return null;
+}
+
 /** Lav et brugerdefineret system ud fra et eksisterende. */
 export function customizeSystem(
   base: ScoringSystem,

@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { JEBERG, WHIST_DK } from "@/scoring";
+import { HJERTERES, JEBERG, WHIST_DK, customizeSystem } from "@/scoring";
 import {
+  createNewGame,
+  checkRoundsAgainstSystem,
+  summarizeSystem,
+  gameSystem,
+  stakeLabel,
+  stakeOere,
   describeRound,
   draftFromRound,
   emptyDraft,
@@ -74,5 +80,58 @@ describe("stillingstavle", () => {
     expect(rows[1]!.running).toEqual({ Anna: 180, Bo: -380, Carl: 180, Dorte: 20 });
     expect(describeRound(rows[0]!.round)).toBe("Anna 8 vip m. Carl · 9 stik");
     expect(describeRound(rows[1]!.round)).toBe("Bo sol ✗");
+  });
+});
+
+describe("regelsæt og indsats pr. spil", () => {
+  it("spillets egen kopi af regelsættet vinder over systemId", () => {
+    expect(gameSystem({ systemId: "jeberg" }).id).toBe("jeberg");
+    expect(gameSystem({ systemId: "ukendt" }).id).toBe(WHIST_DK.id);
+    const own = { ...WHIST_DK, id: "custom-x", baseRate: 5 };
+    expect(gameSystem({ systemId: "whist-dk", system: own }).baseRate).toBe(5);
+  });
+
+  it("kroner kan slås fra uden at glemme indsatsen; ældre spil uden flag virker", () => {
+    expect(stakeOere({ oerePerPoint: 10, moneyEnabled: true })).toBe(10);
+    expect(stakeOere({ oerePerPoint: 10, moneyEnabled: false })).toBe(0);
+    expect(stakeOere({ oerePerPoint: 10 })).toBe(10);
+    expect(stakeOere({ oerePerPoint: 0 })).toBe(0);
+  });
+
+  it("indsats vises i øre eller kroner", () => {
+    expect(stakeLabel(5)).toBe("5 øre");
+    expect(stakeLabel(100)).toBe("1 kr.");
+  });
+});
+
+describe("rettelse af regelsæt i et spil", () => {
+  const seated: [string, string, string, string] = ["Anna", "Bo", "Carl", "Dorte"];
+  const rounds = [
+    { type: "trump" as const, seated, bidder: "Anna", partner: "Bo", bid: { level: 8, pahaeng: "ingen" as const }, tricks: 8 },
+    { type: "sol" as const, seated, sols: [{ player: "Bo", kind: "renBordlaegger" as const, success: true }] },
+  ];
+
+  it("fanger runder, der bruger en solmelding, som er slået fra", () => {
+    expect(checkRoundsAgainstSystem(WHIST_DK, rounds)).toBeNull();
+    expect(checkRoundsAgainstSystem(HJERTERES, rounds)).toBe("Runde 2 bruger ren bordlægger, som er slået fra.");
+  });
+
+  it("opsummering", () => {
+    expect(summarizeSystem(WHIST_DK)).toBe("7 = 10, ×2 pr. stik · påhæng ×2 · bet ×2 · sol 50/100/150/200");
+    expect(summarizeSystem(JEBERG)).toBe("7 = 10, ×2 pr. stik · gode/sans, halve og vip ×2 hver · bet ×2 pr. stik · stor slem +200 · sol 50/100/200");
+    expect(summarizeSystem(customizeSystem(WHIST_DK, { baseRate: 2.5, sol: { sol: null, renSol: null, bordlaegger: null, renBordlaegger: null } }))).toBe(
+      "7 = 2,5, ×2 pr. stik · påhæng ×2 · bet ×2 · ingen sol",
+    );
+  });
+});
+
+describe("nyt spil", () => {
+  it("gemmer en kopi af regelsættet og kronevalget", () => {
+    const g = createNewGame([" Anna ", "Bo", "Carl", "Dorte"], JEBERG, { moneyEnabled: true, oerePerPoint: 5 });
+    expect(g.players[0]).toBe("Anna");
+    expect(g.system).toEqual(JEBERG);
+    expect(g.systemId).toBe("jeberg");
+    expect(stakeOere(g)).toBe(5);
+    expect(g.rounds).toEqual([]);
   });
 });
