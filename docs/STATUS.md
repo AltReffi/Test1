@@ -47,6 +47,7 @@ En dansk **pointtæller til es-makker whist** i App Store (og senere Google Play
 13. App-ikon (spar es på grønt filt), Android-lag inkl. monokromt temaikon, splash (`expo-splash-screen`, grøn baggrund) og favicon. SVG-kilder i `assets/kilde/`, og `scripts/icon/build-icons.js` laver PNG'erne igen. Expo Go viser app-ikonet i stedet for splash, så splash ses først i et rigtigt build.
 
 ## Vigtige beslutninger og antagelser
+- **Navn og bundle ID:** "Whist Regnskab" og `dk.whistregnskab.app` er godkendt af ejeren (3. november 2026). Bundle ID kan ikke ændres efter første upload.
 - **4 spillere:** Ingen af kilderne beskriver es-makker whist med 5 spillere, så muligheden er fjernet. Motoren understøtter stadig `seated` pr. runde.
 - **whist.dk:** bordlægger giver 150 og ren bordlægger 200. Tallene er læst direkte fra https://whist.dk/whist-regler.
 - **Hjerteres:** tabt trumfmelding koster dobbelt takst. Det er en antagelse, da siden kun siger det om sol.
@@ -58,11 +59,10 @@ En dansk **pointtæller til es-makker whist** i App Store (og senere Google Play
 
 ## Næste skridt (forslag)
 1. **Test ved et rigtigt bord** i Expo Go og ret det, der føles langsomt eller forkert. Afprøv især på telefonen: backup via dele-menuen og hent fra Filer, "Del resultat" til Beskeder/Messenger, sletning af runde/spil (bekræftelsesdialogen virker ikke på web).
-2. Endeligt navn. Bundle ID (`dk.whistregnskab.app`) skal godkendes, før første build, fordi det ikke kan ændres bagefter.
-3. Deling som billede (kræver en pakke, der skal tjekkes for Expo Go), hvis tekst ikke er nok.
-4. Bordvisning til iPad.
-5. Husregler (se ovenfor), hvis gruppen bruger dem.
-6. Når udviklerkontoen er købt: følg tjeklisten i `docs/appstore/README.md` (EAS Build, TestFlight, App Store Connect, Small Business Program).
+2. Deling som billede (kræver en pakke, der skal tjekkes for Expo Go), hvis tekst ikke er nok.
+3. Bordvisning til iPad.
+4. Husregler (se ovenfor), hvis gruppen bruger dem.
+5. Når udviklerkontoen er købt: følg tjeklisten i `docs/appstore/README.md` (EAS Build, TestFlight, App Store Connect, Small Business Program).
 
 ## Sådan verificeres ændringer
 ```bash
