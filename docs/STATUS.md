@@ -41,27 +41,25 @@ En dansk **pointtæller til es-makker whist** i App Store (og senere Google Play
 9. Giver: stillingstavlen og rundeskærmen viser, hvem der giver. Giveren går én plads videre efter hver runde, også ved alle pas. "Skift" flytter giveren, hvis bordet og appen er uenige (gemmes som `firstDealer`).
 10. Backup og gendannelse (`/backup`, link nederst på forsiden): alle spil og egne regelsæt gemmes som JSON via dele-menuen (`expo-file-system` + `expo-sharing`). Gendannelse fletter uden at slette noget, og ved samme spil vinder den nyeste `updatedAt`. Webudgaven (`backupFile.web.ts`) downloader og vælger fil i browseren.
 11. "Del resultat" på afregningen: stilling og evt. hvem betaler hvem som tekst via React Natives `Share` (ingen ekstra pakke). Teksten bygges i `src/game/shareText.ts`. `formatPoints` og `formatKroner` ligger i `src/scoring/` og bruger rigtigt minustegn (U+2212).
+12. App Store-forberedelse (`docs/appstore/`): `eas.json`, bundle ID og eksportoplysninger i `app.json`, butikstekster, privatlivspolitik og kladder til skærmbilleder. Tjeklisten i `docs/appstore/README.md` siger, hvad der mangler.
 
 ## Vigtige beslutninger og antagelser
 - **4 spillere:** Ingen af kilderne beskriver es-makker whist med 5 spillere, så muligheden er fjernet. Motoren understøtter stadig `seated` pr. runde.
 - **whist.dk:** bordlægger giver 150 og ren bordlægger 200. Tallene er læst direkte fra https://whist.dk/whist-regler.
 - **Hjerteres:** tabt trumfmelding koster dobbelt takst. Det er en antagelse, da siden kun siger det om sol.
 - **jeberg.eu:** taksterne G=10, S=50 og SS=200 er valgte standardværdier. Ifølge reglerne aftales de ved bordet.
+- **Ingen iPad i første version:** `ios.supportsTablet` er `false`, så Apple ikke kræver iPad-skærmbilleder. Sæt den til `true` sammen med bordvisningen til iPad.
 - **Regelsæt pr. spil:** hvert spil gemmer sin egen kopi i `game.system`. Ældre spil uden feltet bruger `systemId`, og ældre spil uden `moneyEnabled` regnes som "til", når `oerePerPoint > 0`. Brug altid `gameSystem(game)` og `stakeOere(game)`.
 - **Spillere i statistikken** genkendes på navnet, uden forskel på store og små bogstaver. Den seneste stavemåde vises.
 - **Ikke med endnu (husregler):** at gå med i en vip eller en sol, kvarte, stærke, jernhånd.
 
 ## Næste skridt (forslag)
 1. **Test ved et rigtigt bord** i Expo Go og ret det, der føles langsomt eller forkert. Afprøv især på telefonen: backup via dele-menuen og hent fra Filer, "Del resultat" til Beskeder/Messenger, sletning af runde/spil (bekræftelsesdialogen virker ikke på web).
-2. App-ikon, splash og endeligt navn. `assets/` indeholder stadig Expos standardbilleder.
+2. App-ikon, splash og endeligt navn. `assets/` indeholder stadig Expos standardbilleder. Bundle ID (`dk.whistregnskab.app`) skal godkendes, før første build, fordi det ikke kan ændres bagefter.
 3. Deling som billede (kræver en pakke, der skal tjekkes for Expo Go), hvis tekst ikke er nok.
 4. Bordvisning til iPad.
 5. Husregler (se ovenfor), hvis gruppen bruger dem.
-6. Når udviklerkontoen er købt:
-   - `eas.json` og EAS Build
-   - TestFlight
-   - App Store-side med skærmbilleder og privatlivserklæring ("indsamler ingen data")
-   - Small Business Program (Apple tager 15 % i stedet for 30 %)
+6. Når udviklerkontoen er købt: følg tjeklisten i `docs/appstore/README.md` (EAS Build, TestFlight, App Store Connect, Small Business Program).
 
 ## Sådan verificeres ændringer
 ```bash
