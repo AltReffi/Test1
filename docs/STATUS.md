@@ -2,6 +2,8 @@
 
 Senest opdateret: 3. november 2026. Læs denne fil først i en ny session.
 
+Skifter du fra skyen til din Mac, så se [HANDOFF-MAC.md](HANDOFF-MAC.md).
+
 ## Mål
 En dansk **pointtæller til es-makker whist** i App Store (og senere Google Play). Den skal mindst tjene Apples udviklerlicens på 99 $ hjem.
 - **Forretningsmodel:** betalt app til ca. 29 kr. uden køb i appen og uden reklamer. Ca. 35 salg om året dækker licensen.
