@@ -20,4 +20,4 @@ Du kan slette et spil i appen ved at holde fingeren på det. Sletter du appen, s
 Appen indsamler ingen oplysninger om nogen, heller ikke om børn.
 
 **Kontakt**
-Spørgsmål kan sendes til [din e-mail].
+Spørgsmål kan sendes til NorthdockTools@proton.me.
