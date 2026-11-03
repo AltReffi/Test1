@@ -35,13 +35,22 @@ export default function GameScreen() {
         options={{
           title: system.name,
           headerRight: () => (
-            <Pressable
-              accessibilityRole="button"
-              hitSlop={12}
-              onPress={() => router.push({ pathname: "/game/[id]/rules", params: { id: game.id } })}
-            >
-              <Text style={{ color: t.accent, fontSize: 17, fontWeight: "600" }}>Regler</Text>
-            </Pressable>
+            <View style={{ flexDirection: "row", gap: 18 }}>
+              <Pressable
+                accessibilityRole="button"
+                hitSlop={12}
+                onPress={() => router.push({ pathname: "/game/[id]/stats", params: { id: game.id } })}
+              >
+                <Text style={{ color: t.accent, fontSize: 17, fontWeight: "600" }}>Statistik</Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                hitSlop={12}
+                onPress={() => router.push({ pathname: "/game/[id]/rules", params: { id: game.id } })}
+              >
+                <Text style={{ color: t.accent, fontSize: 17, fontWeight: "600" }}>Regler</Text>
+              </Pressable>
+            </View>
           ),
         }}
       />

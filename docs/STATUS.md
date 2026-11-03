@@ -38,6 +38,10 @@ En dansk **pointtæller til es-makker whist** i App Store (og senere Google Play
    - selvmakker, som makker og sol
    - bedste og værste runde
    - makkerpar
+   - point på egne meldinger (trumf og sol), point som makker og bedste makker pr. spiller
+   - rekorder: flest meldinger hjem, flest point på egne meldinger og som makker, bedste makkerpar, flest sol hjem, bedste runde
+
+   Samme visning (`src/ui/StatsView.tsx`) findes for det enkelte spil via "Statistik" øverst på stillingstavlen (`/game/[id]/stats`).
 7. Prøvespil i browseren (iPhone 13 og iPhone SE, 20 runder): en almindelig melding tager 6 tryk inkl. "Ny runde" og "Gem". Rundeskærmen er gjort kompakt (meldinger, påhæng og stik i faste kolonner), og den ruller selv stikkene frem, når makker er valgt.
 8. Egne regelsæt i appen, som gemmes til nye spil. Reglerne kan også rettes i et igangværende spil, hvorefter alle runder regnes om. Ændringer, der gør tidligere runder ugyldige, afvises.
 9. Giver: stillingstavlen og rundeskærmen viser, hvem der giver. Giveren går én plads videre efter hver runde, også ved alle pas. "Skift" flytter giveren, hvis bordet og appen er uenige (gemmes som `firstDealer`).

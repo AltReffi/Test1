@@ -38,18 +38,21 @@ describe("statistik", () => {
     expect(anna.aloneMade).toBe(0);
     expect(anna.bestRound).toBe(40);
     expect(anna.worstRound).toBe(-240);
+    expect(anna.bidPoints).toBe(-200); // +40 −240
 
     const bo = stats.players.find((p) => p.name === "Bo")!;
     // −40 +80 +150 = 190
     expect(bo.points).toBe(190);
     expect(bo.sols).toBe(1);
     expect(bo.solsMade).toBe(1);
+    expect(bo.bidPoints).toBe(150);
     expect(bo.wins).toBe(1);
     expect(stats.players[0]!.name).toBe("Bo");
 
     const carl = stats.players.find((p) => p.name === "Carl")!;
     expect(carl.asPartner).toBe(1);
     expect(carl.asPartnerMade).toBe(1);
+    expect(carl.partnerPoints).toBe(40);
     expect(stats.pairs).toEqual([{ names: ["Anna", "Carl"], rounds: 1, made: 1, points: 40 }]);
   });
 

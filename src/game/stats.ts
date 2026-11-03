@@ -27,10 +27,14 @@ export interface PlayerStats {
   avgTrickDiff: number | null;
   alone: number;
   aloneMade: number;
+  /** Point i runder, hvor spilleren selv meldte (trumf eller sol). */
+  bidPoints: number;
 
   /** Runder som makker. */
   asPartner: number;
   asPartnerMade: number;
+  /** Point i runder som makker. */
+  partnerPoints: number;
 
   sols: number;
   solsMade: number;
@@ -78,8 +82,10 @@ function emptyPlayer(key: string, name: string): PlayerStats {
     avgTrickDiff: null,
     alone: 0,
     aloneMade: 0,
+    bidPoints: 0,
     asPartner: 0,
     asPartnerMade: 0,
+    partnerPoints: 0,
     sols: 0,
     solsMade: 0,
     bestRound: null,
@@ -135,6 +141,7 @@ export function computeStats(games: readonly Game[], since = 0): StatsResult {
         const b = get(round.bidder);
         b.bids++;
         if (made) b.bidsMade++;
+        b.bidPoints += deltas[round.bidder] ?? 0;
         levelSum.set(b.key, (levelSum.get(b.key) ?? 0) + round.bid.level);
         diffSum.set(b.key, (diffSum.get(b.key) ?? 0) + (round.tricks - round.bid.level));
         if (round.partner === null) {
@@ -144,6 +151,7 @@ export function computeStats(games: readonly Game[], since = 0): StatsResult {
           const partner = get(round.partner);
           partner.asPartner++;
           if (made) partner.asPartnerMade++;
+          partner.partnerPoints += deltas[round.partner] ?? 0;
 
           const keys = [b.key, partner.key].sort();
           const pairKey = keys.join("|");
@@ -158,6 +166,8 @@ export function computeStats(games: readonly Game[], since = 0): StatsResult {
           const s = get(sol.player);
           s.sols++;
           if (sol.success) s.solsMade++;
+          // ponytail: ved flere sol i samme runde tæller hele rundens point, også betaling til de andres sol.
+          s.bidPoints += deltas[sol.player] ?? 0;
         }
       }
     }
