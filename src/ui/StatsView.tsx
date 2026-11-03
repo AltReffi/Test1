@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import { formatKroner } from "@/scoring";
-import { percent, playerKey, type PairStats, type PlayerStats, type StatsResult } from "@/game/stats";
+import { percent, type PairStats, type PlayerStats, type StatsResult } from "@/game/stats";
 import { Points, Section } from "./components";
 import { formatPoints, useTheme } from "./theme";
 
@@ -29,9 +29,9 @@ function leaders(players: PlayerStats[], value: (s: PlayerStats) => number): { n
 
 function bestPartner(s: PlayerStats, pairs: PairStats[]): string {
   // Parrene er sorteret efter point, så det første par med spilleren er det bedste.
-  const pair = pairs.find((p) => p.names.some((n) => playerKey(n) === s.key));
+  const pair = pairs.find((p) => p.keys.includes(s.key));
   if (!pair) return "–";
-  const other = playerKey(pair.names[0]) === s.key ? pair.names[1] : pair.names[0];
+  const other = pair.keys[0] === s.key ? pair.names[1] : pair.names[0];
   return `${other} (${formatPoints(pair.points)})`;
 }
 
@@ -126,7 +126,7 @@ export function StatsView({ stats, showStanding }: { stats: StatsResult; showSta
       {stats.pairs.length > 0 && (
         <Section title="Makkerpar">
           {stats.pairs.slice(0, 6).map((p) => (
-            <View key={p.names.join("|")} style={[styles.row, { borderColor: t.border }]}>
+            <View key={p.keys.join("|")} style={[styles.row, { borderColor: t.border }]}>
               <View style={{ flex: 1 }}>
                 <Text style={[styles.rowName, { color: t.text }]}>
                   {p.names[0]} & {p.names[1]}

@@ -1,12 +1,9 @@
 import { scoreRound, type PlayerId } from "@/scoring";
 import { gameSystem, stakeOere, type Game } from "./model";
-
-/** Spillere genkendes på tværs af spil ud fra navnet (uden forskel på store/små bogstaver). */
-export function playerKey(name: string): string {
-  return name.trim().toLocaleLowerCase("da");
-}
+import { gamePlayerIds } from "./players";
 
 export interface PlayerStats {
+  /** Spillerens ID (se `gamePlayerIds`). */
   key: string;
   /** Navnet som det blev skrevet i det seneste spil. */
   name: string;
@@ -46,6 +43,8 @@ export interface PlayerStats {
 export interface PairStats {
   /** Navnene i alfabetisk rækkefølge. */
   names: [string, string];
+  /** Spillernes ID'er (samme rækkefølge som `names`). */
+  keys: [string, string];
   rounds: number;
   made: number;
   /** Point pr. spiller for parret samlet. */
@@ -98,7 +97,7 @@ export function computeStats(games: readonly Game[], since = 0): StatsResult {
   const players = new Map<string, PlayerStats>();
   const levelSum = new Map<string, number>();
   const diffSum = new Map<string, number>();
-  const pairs = new Map<string, PairStats & { keys: string[] }>();
+  const pairs = new Map<string, PairStats>();
   let gameCount = 0;
   let roundCount = 0;
 
@@ -109,8 +108,9 @@ export function computeStats(games: readonly Game[], since = 0): StatsResult {
     gameCount++;
     roundCount += game.rounds.length;
     const system = gameSystem(game);
+    const ids = gamePlayerIds(game);
     const get = (name: PlayerId): PlayerStats => {
-      const key = playerKey(name);
+      const key = ids[game.players.indexOf(name)] ?? name;
       let s = players.get(key);
       if (!s) {
         s = emptyPlayer(key, name);
@@ -153,9 +153,9 @@ export function computeStats(games: readonly Game[], since = 0): StatsResult {
           if (made) partner.asPartnerMade++;
           partner.partnerPoints += deltas[round.partner] ?? 0;
 
-          const keys = [b.key, partner.key].sort();
+          const keys = [b.key, partner.key].sort() as [string, string];
           const pairKey = keys.join("|");
-          const pair = pairs.get(pairKey) ?? { keys, names: ["", ""], rounds: 0, made: 0, points: 0 };
+          const pair = pairs.get(pairKey) ?? { names: ["", ""], keys, rounds: 0, made: 0, points: 0 };
           pair.rounds++;
           if (made) pair.made++;
           pair.points += deltas[round.bidder] ?? 0;
@@ -182,8 +182,9 @@ export function computeStats(games: readonly Game[], since = 0): StatsResult {
 
   // Parrets navne sættes til sidst, så de følger spillernes seneste stavemåde.
   for (const pair of pairs.values()) {
-    const names = pair.keys.map((k) => players.get(k)?.name ?? k);
-    pair.names = names.sort((x, y) => x.localeCompare(y, "da")) as [string, string];
+    const named = pair.keys.map((k) => ({ k, name: players.get(k)?.name ?? k })).sort((x, y) => x.name.localeCompare(y.name, "da"));
+    pair.names = [named[0]!.name, named[1]!.name];
+    pair.keys = [named[0]!.k, named[1]!.k];
   }
 
   for (const s of players.values()) {
@@ -197,7 +198,7 @@ export function computeStats(games: readonly Game[], since = 0): StatsResult {
     games: gameCount,
     rounds: roundCount,
     players: [...players.values()].sort((a, b) => b.points - a.points),
-    pairs: [...pairs.values()].map(({ keys: _keys, ...pair }) => pair).sort((a, b) => b.points - a.points),
+    pairs: [...pairs.values()].sort((a, b) => b.points - a.points),
   };
 }
 

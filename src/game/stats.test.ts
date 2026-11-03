@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Round } from "@/scoring";
 import type { Game } from "./model";
+import { gamePlayerIds, knownPlayers, playersNamed } from "./players";
 import { computeStats, percent, periodStart } from "./stats";
 
 const seated: [string, string, string, string] = ["Anna", "Bo", "Carl", "Dorte"];
@@ -53,7 +54,7 @@ describe("statistik", () => {
     expect(carl.asPartner).toBe(1);
     expect(carl.asPartnerMade).toBe(1);
     expect(carl.partnerPoints).toBe(40);
-    expect(stats.pairs).toEqual([{ names: ["Anna", "Carl"], rounds: 1, made: 1, points: 40 }]);
+    expect(stats.pairs).toEqual([{ names: ["Anna", "Carl"], keys: ["anna", "carl"], rounds: 1, made: 1, points: 40 }]);
   });
 
   it("samler spillere på tværs af spil uanset store/små bogstaver og bruger seneste stavemåde", () => {
@@ -66,7 +67,7 @@ describe("statistik", () => {
     expect(anna[0]!.name).toBe("Anna");
     expect(anna[0]!.games).toBe(2);
     expect(anna[0]!.bids).toBe(2);
-    expect(stats.pairs).toEqual([{ names: ["Anna", "Carl"], rounds: 2, made: 2, points: 80 }]);
+    expect(stats.pairs).toEqual([{ names: ["Anna", "Carl"], keys: ["anna", "carl"], rounds: 2, made: 2, points: 80 }]);
   });
 
   it("delt førsteplads tæller som sejr for begge, og tomme spil tæller ikke", () => {
@@ -89,6 +90,33 @@ describe("statistik", () => {
     const off = { ...game("g1", 1000, [r.annaMade], seated, 10), moneyEnabled: false };
     const stats = computeStats([off]);
     expect(stats.players.every((p) => p.oere === 0)).toBe(true);
+  });
+
+  it("spiller-ID samler forskellige stavemåder og skiller to med samme navn", () => {
+    const ids = ["id-anna", "id-bo", "id-carl", "id-dorte"];
+    const g1 = { ...game("g1", 1000, [r.annaMade]), playerIds: ids };
+    // Samme Anna, men stavet "Ana"; og en anden Carl med eget ID.
+    const seated2 = ["Ana", "Bo", "Carl", "Dorte"];
+    const round2 = { ...(r.annaMade as Extract<Round, { type: "trump" }>), seated: seated2, bidder: "Ana" } as Round;
+    const g2 = { ...game("g2", 2000, [round2], seated2), playerIds: ["id-anna", "id-bo", "id-carl2", "id-dorte"] };
+    const stats = computeStats([g1, g2]);
+
+    const anna = stats.players.filter((p) => p.key === "id-anna");
+    expect(anna).toHaveLength(1);
+    expect(anna[0]!.name).toBe("Ana");
+    expect(anna[0]!.bids).toBe(2);
+    expect(stats.players.filter((p) => p.name === "Carl")).toHaveLength(2);
+    expect(stats.pairs.map((p) => p.keys)).toEqual([
+      ["id-anna", "id-carl"],
+      ["id-anna", "id-carl2"],
+    ]);
+
+    const known = knownPlayers([g1, g2]);
+    expect(known).toHaveLength(5);
+    expect(known.find((p) => p.id === "id-anna")).toMatchObject({ name: "Ana", games: 2 });
+    expect(playersNamed(known, " carl ").map((p) => p.id)).toEqual(["id-carl2", "id-carl"]);
+    // Ældre spil uden ID bruger navnet som ID.
+    expect(gamePlayerIds(game("old", 0, []))).toEqual(["anna", "bo", "carl", "dorte"]);
   });
 
   it("procent", () => {

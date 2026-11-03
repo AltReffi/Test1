@@ -20,6 +20,11 @@ export interface Game {
   createdAt: number;
   updatedAt: number;
   players: PlayerId[];
+  /**
+   * Fast ID pr. plads (samme rækkefølge som `players`), så statistikken kan følge en spiller på tværs af spil,
+   * uanset stavemåde, og skelne to med samme navn. Mangler i ældre spil — se `gamePlayerIds`.
+   */
+  playerIds?: string[];
   systemId: string;
   /**
    * Spillets egen kopi af regelsættet. Kan rettes undervejs uden at påvirke andre spil.
@@ -264,14 +269,20 @@ export function summarizeSystem(s: ScoringSystem): string {
   return parts.join(" · ");
 }
 
-/** Opret et nyt spil med sin egen kopi af regelsættet. */
-export function createNewGame(players: PlayerId[], system: ScoringSystem, money: { moneyEnabled: boolean; oerePerPoint: number }): Game {
+/** Opret et nyt spil med sin egen kopi af regelsættet. `playerIds` er null (eller mangler) for nye spillere. */
+export function createNewGame(
+  players: PlayerId[],
+  system: ScoringSystem,
+  money: { moneyEnabled: boolean; oerePerPoint: number },
+  playerIds: readonly (string | null)[] = [],
+): Game {
   const now = Date.now();
   return {
     id: newGameId(),
     createdAt: now,
     updatedAt: now,
     players: players.map((p) => p.trim()),
+    playerIds: players.map((_, i) => playerIds[i] ?? `p-${newGameId()}`),
     systemId: system.id,
     system,
     ...money,

@@ -58,7 +58,9 @@ En dansk **pointtæller til es-makker whist** i App Store (og senere Google Play
 - **jeberg.eu:** taksterne G=10, S=50 og SS=200 er valgte standardværdier. Ifølge reglerne aftales de ved bordet.
 - **Ingen iPad i første version:** `ios.supportsTablet` er `false`, så Apple ikke kræver iPad-skærmbilleder. Sæt den til `true` sammen med bordvisningen til iPad.
 - **Regelsæt pr. spil:** hvert spil gemmer sin egen kopi i `game.system`. Ældre spil uden feltet bruger `systemId`, og ældre spil uden `moneyEnabled` regnes som "til", når `oerePerPoint > 0`. Brug altid `gameSystem(game)` og `stakeOere(game)`.
-- **Spillere i statistikken** genkendes på navnet, uden forskel på store og små bogstaver. Den seneste stavemåde vises.
+- **Spiller-ID:** nye spil gemmer et ID pr. plads i `game.playerIds`. Statistikken samler på ID, så en spiller følges uanset stavemåde, og to med samme navn holdes adskilt. Ældre spil uden ID bruger navnet (uden forskel på store/små bogstaver) som ID. Brug altid `gamePlayerIds(game)` (`src/game/players.ts`). Den seneste stavemåde vises.
+- **Gemte spillere** er ikke en egen liste. De udledes af tidligere spil (`knownPlayers`), så de kommer automatisk med i backup. Ved "Nyt spil" kan man trykke på en gemt spiller, og et indtastet navn kobles til den senest brugte spiller med samme navn. Er der flere med samme navn, vælger man mellem dem, eller "Ny spiller".
+- **Ikke med endnu:** omdøbning af en gemt spiller på tværs af gamle spil. Runderne gemmer navne, så det kræver, at runderne skrives om.
 - **Ikke med endnu (husregler):** at gå med i en vip eller en sol, kvarte, stærke, jernhånd.
 
 ## Næste skridt (forslag)
