@@ -49,6 +49,8 @@ En dansk **pointtæller til es-makker whist** i App Store (og senere Google Play
 11. "Del resultat" på afregningen: stilling og evt. hvem betaler hvem som tekst via React Natives `Share` (ingen ekstra pakke). Teksten bygges i `src/game/shareText.ts`. `formatPoints` og `formatKroner` ligger i `src/scoring/` og bruger rigtigt minustegn (U+2212).
 12. App Store-forberedelse (`docs/appstore/`): `eas.json`, bundle ID og eksportoplysninger i `app.json`, butikstekster, privatlivspolitik og kladder til skærmbilleder. Tjeklisten i `docs/appstore/README.md` siger, hvad der mangler.
 13. App-ikon (spar es på grønt filt), Android-lag inkl. monokromt temaikon, splash (`expo-splash-screen`, grøn baggrund) og favicon. SVG-kilder i `assets/kilde/`, og `scripts/icon/build-icons.js` laver PNG'erne igen. Expo Go viser app-ikonet i stedet for splash, så splash ses først i et rigtigt build.
+14. "Fortryd runde" på stillingstavlen sletter sidste runde efter bekræftelse.
+15. "Del som billede" på afregningen (`react-native-view-shot` + `expo-sharing`, begge med i Expo Go). Deler stilling og hvem betaler hvem som PNG. Virker ikke på web.
 
 ## Vigtige beslutninger og antagelser
 - **Navn og bundle ID:** "Whist Regnskab" og `dk.whistregnskab.app` er godkendt af ejeren (3. november 2026). Bundle ID kan ikke ændres efter første upload.
@@ -60,15 +62,14 @@ En dansk **pointtæller til es-makker whist** i App Store (og senere Google Play
 - **Regelsæt pr. spil:** hvert spil gemmer sin egen kopi i `game.system`. Ældre spil uden feltet bruger `systemId`, og ældre spil uden `moneyEnabled` regnes som "til", når `oerePerPoint > 0`. Brug altid `gameSystem(game)` og `stakeOere(game)`.
 - **Spiller-ID:** nye spil gemmer et ID pr. plads i `game.playerIds`. Statistikken samler på ID, så en spiller følges uanset stavemåde, og to med samme navn holdes adskilt. Ældre spil uden ID bruger navnet (uden forskel på store/små bogstaver) som ID. Brug altid `gamePlayerIds(game)` (`src/game/players.ts`). Den seneste stavemåde vises.
 - **Gemte spillere** er ikke en egen liste. De udledes af tidligere spil (`knownPlayers`), så de kommer automatisk med i backup. Ved "Nyt spil" kan man trykke på en gemt spiller, og et indtastet navn kobles til den senest brugte spiller med samme navn. Er der flere med samme navn, vælger man mellem dem, eller "Ny spiller".
-- **Ikke med endnu:** omdøbning af en gemt spiller på tværs af gamle spil. Runderne gemmer navne, så det kræver, at runderne skrives om.
+- **Omdøbning** (`/players`, link på forsiden): `renamePlayer` i `src/game/players.ts` skriver navnet om i `players` og alle runder (`seated`, `bidder`, `partner`, `sols[].player`), skriver ID'et ind i ældre spil og sætter `updatedAt`, så en gammel backup ikke henter det gamle navn tilbage. Afvises, hvis en anden i samme spil hedder det samme.
 - **Ikke med endnu (husregler):** at gå med i en vip eller en sol, kvarte, stærke, jernhånd.
 
 ## Næste skridt (forslag)
-1. **Test ved et rigtigt bord** i Expo Go og ret det, der føles langsomt eller forkert. Afprøv især på telefonen: backup via dele-menuen og hent fra Filer, "Del resultat" til Beskeder/Messenger, sletning af runde/spil (bekræftelsesdialogen virker ikke på web).
-2. Deling som billede (kræver en pakke, der skal tjekkes for Expo Go), hvis tekst ikke er nok.
+1. **Test ved et rigtigt bord** i Expo Go og ret det, der føles langsomt eller forkert. Endnu ikke testet på telefonen: statistik i spillet, gemte spillere, omdøbning, "Fortryd runde" (bekræftelsesdialogen virker ikke på web) og "Del som billede".
+2. Husregler (se ovenfor), hvis gruppen bruger dem. Ejeren skal vælge hvilke.
 3. Bordvisning til iPad.
-4. Husregler (se ovenfor), hvis gruppen bruger dem.
-5. Når udviklerkontoen er købt: følg tjeklisten i `docs/appstore/README.md` (EAS Build, TestFlight, App Store Connect, Small Business Program).
+4. Når udviklerkontoen er købt: følg tjeklisten i `docs/appstore/README.md` (EAS Build, TestFlight, App Store Connect, Small Business Program).
 
 ## Sådan verificeres ændringer
 ```bash

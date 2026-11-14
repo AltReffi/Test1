@@ -64,6 +64,11 @@ export default function HomeScreen() {
       {games.length > 0 && (
         <Text style={[styles.hint, { color: t.textMuted }]}>Hold fingeren på et spil for at slette det.</Text>
       )}
+      {games.length > 0 && (
+        <Pressable accessibilityRole="button" onPress={() => router.push("/players")} hitSlop={8} style={styles.backupLink}>
+          <Text style={{ color: t.accent, fontSize: 15, fontWeight: "600" }}>Spillere</Text>
+        </Pressable>
+      )}
       {loaded && (
         <Pressable accessibilityRole="button" onPress={() => router.push("/backup")} hitSlop={8} style={styles.backupLink}>
           <Text style={{ color: t.accent, fontSize: 15, fontWeight: "600" }}>Backup og gendannelse</Text>

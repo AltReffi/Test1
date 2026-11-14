@@ -1,5 +1,5 @@
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { describeRound, firstDealerFor, gameSystem, nextDealer, roundsWithRunningTotals } from "@/game/model";
 import { useGames } from "@/game/store";
 import { Button, Points } from "@/ui/components";
@@ -8,7 +8,7 @@ import { useTheme } from "@/ui/theme";
 export default function GameScreen() {
   const t = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { getGame, updateGame } = useGames();
+  const { getGame, updateGame, deleteRound } = useGames();
   const game = getGame(id);
 
   if (!game) {
@@ -27,6 +27,15 @@ export default function GameScreen() {
   const shiftDealer = () => {
     const next = game.players[(game.players.indexOf(dealer) + 1) % game.players.length]!;
     updateGame(game.id, { firstDealer: firstDealerFor(game, next) });
+  };
+  const undoLast = () => {
+    const last = game.rounds.length - 1;
+    const round = game.rounds[last];
+    if (!round) return;
+    Alert.alert(`Fortryd runde ${last + 1}?`, describeRound(round), [
+      { text: "Annuller", style: "cancel" },
+      { text: "Fortryd", style: "destructive", onPress: () => deleteRound(game.id, last) },
+    ]);
   };
 
   return (
@@ -71,9 +80,16 @@ export default function GameScreen() {
           <Text style={[styles.dealerText, { color: t.text }]}>
             <Text style={{ fontWeight: "700" }}>{dealer}</Text> giver runde {game.rounds.length + 1}
           </Text>
-          <Pressable accessibilityRole="button" accessibilityLabel="Skift giver" hitSlop={10} onPress={shiftDealer}>
-            <Text style={{ color: t.accent, fontSize: 15, fontWeight: "600" }}>Skift</Text>
-          </Pressable>
+          <View style={{ flexDirection: "row", gap: 20 }}>
+            {game.rounds.length > 0 && (
+              <Pressable accessibilityRole="button" accessibilityLabel="Fortryd sidste runde" hitSlop={10} onPress={undoLast}>
+                <Text style={{ color: t.accent, fontSize: 15, fontWeight: "600" }}>Fortryd runde</Text>
+              </Pressable>
+            )}
+            <Pressable accessibilityRole="button" accessibilityLabel="Skift giver" hitSlop={10} onPress={shiftDealer}>
+              <Text style={{ color: t.accent, fontSize: 15, fontWeight: "600" }}>Skift</Text>
+            </Pressable>
+          </View>
         </View>
 
         {rows.length === 0 && (

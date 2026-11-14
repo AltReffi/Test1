@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { Round, ScoringSystem } from "@/scoring";
 import { mergeBackup, type Backup, type MergeResult } from "./backup";
 import type { Game } from "./model";
+import { renamePlayer, type RenameResult } from "./players";
 
 const GAMES_KEY = "whist:games:v1";
 const SYSTEMS_KEY = "whist:systems:v1";
@@ -24,6 +25,8 @@ interface GamesContextValue {
   deleteCustomSystem: (id: string) => void;
   /** Flet en backup ind uden at slette noget. */
   importBackup: (backup: Backup) => MergeResult;
+  /** Omdøb en spiller (efter ID) i alle spil. */
+  renamePlayer: (id: string, name: string) => RenameResult;
 }
 
 const GamesContext = createContext<GamesContextValue | null>(null);
@@ -86,6 +89,11 @@ export function GamesProvider({ children }: { children: ReactNode }) {
         const result = mergeBackup(games, customSystems, backup);
         setGames(result.games);
         setCustomSystems(result.customSystems);
+        return result;
+      },
+      renamePlayer: (id, name) => {
+        const result = renamePlayer(games, id, name, Date.now());
+        if (result.ok) setGames(result.games);
         return result;
       },
     }),
