@@ -6,12 +6,12 @@ Kopiér hele teksten i boksen herunder ind i en ny Claude Code-samtale på din M
 Du overtager et projekt fra en Claude-session i skyen. Ejeren vil lave så lidt som muligt selv, skriver dansk og vibe-coder. Gør trinene selv og spørg kun, når du er nødt til det (højst ét spørgsmål ad gangen).
 
 PROJEKTET
-Dansk pointtæller til es-makker whist (Expo SDK 58, Expo Router, TypeScript). GitHub: AltReffi/Test1. Alt arbejde ligger på grenen claude/laughing-goldberg-0k5p6x (ikke main).
+Dansk pointtæller til es-makker whist (Expo SDK 58, Expo Router, TypeScript). GitHub: AltReffi/Test1. Alt arbejde ligger på main.
 
 1. KLARGØR
 - Tjek at git og Node.js (LTS, 20 eller nyere) findes: `git --version`, `node --version`. Mangler Node, så bed ejeren hente LTS-installeren fra nodejs.org og vent. Mangler git, så kør `xcode-select --install` og bed ejeren trykke Installér.
 - Hvis den aktuelle mappe allerede er en klon af AltReffi/Test1, så brug den. Ellers klon til ~/Udvikling/Test1: `mkdir -p ~/Udvikling && git clone https://github.com/AltReffi/Test1.git ~/Udvikling/Test1`. Kræver GitHub login, så forklar ejeren præcis hvad der skal trykkes (fx `gh auth login`, hvis GitHub CLI findes, ellers et personligt adgangstoken eller GitHub Desktop).
-- `git checkout claude/laughing-goldberg-0k5p6x && git pull`, derefter `npm install`.
+- `git checkout main && git pull`, derefter `npm install`.
 - Kør `npm test` og `npm run typecheck`. Begge skal være grønne (53 tests).
 
 2. LÆS
@@ -29,7 +29,6 @@ Læs CLAUDE.md, AGENTS.md, docs/STATUS.md og docs/appstore/README.md. STATUS.md 
 4. ÅBNE BESLUTNINGER (spørg ejeren én ad gangen, når det passer)
 - Godkend bundle ID `dk.whistregnskab.app` og navnet "Whist Regnskab" (bundle ID kan ikke ændres efter første upload til Apple).
 - Kontakt-e-mail til privatlivspolitikken (docs/appstore/privatlivspolitik.md har pladsholderen "[din e-mail]"), og hvor politikken skal ligge offentligt.
-- Skal grenen flettes ind i main? Anbefaling: ja, via en pull request, når første test i Expo Go er god.
 
 5. DEREFTER
 Næste skridt står i docs/STATUS.md. Når ejeren har købt Apples udviklerkonto: følg docs/appstore/README.md (EAS Build, TestFlight, App Store Connect), og tag rigtige skærmbilleder i iOS-simulatoren i stedet for kladderne i docs/appstore/skaermbilleder/.
@@ -40,4 +39,4 @@ REGLER
 ```
 
 ## Hvis du hellere vil gøre det selv
-Se trin 1–3 i boksen: klon, `git checkout claude/laughing-goldberg-0k5p6x`, `npm install`, `npx expo start`.
+Se trin 1–3 i boksen: klon, `git checkout main`, `npm install`, `npx expo start`.
